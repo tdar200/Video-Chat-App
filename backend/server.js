@@ -55,10 +55,13 @@ const users = {
 io.on("connection", async (socket) => {
   // console.log(socket, "socket backend")
   socket.on("logged", ({userId, socketId}) => {
-    // console.log("connection", socketId, userId);
-    users[userId] = { socketId };
-    // console.log("users", users)
+    console.log("connection", socketId, userId);
+    users[userId] =  socketId ;
+   
   });
+
+  console.log("users", users)
+  
   socket.on("userId", (userId, socketId) => {
     // console.log(userId, "user id from backend");
     socket.emit("user", {
@@ -69,7 +72,10 @@ io.on("connection", async (socket) => {
     // socket.emit("me", socket.handshake.query.id);
   });
 
-  socket.on;
+
+  // console.log(users,"users")
+
+
 
   // socket.on("me", () => {
   //   socket.broadcast.emit("me", userId);
@@ -88,12 +94,13 @@ io.on("connection", async (socket) => {
   socket.on("callUser", ({ userToCall, signalData, from }) => {
     // console.log("backend user to call", userToCall);
 
-    console.log("call user",  users[from.userId])
+    console.log("call user", users[userToCall])
+    
     // console.log("backend data", { userToCall, signalData, from });
-    io.to(userToCall).emit("callUser", {
+    io.to(users[userToCall]).emit("callUser", {
       
       signal: signalData,
-      from: users[from.userId],
+      from: users[from],
     });
   });
 

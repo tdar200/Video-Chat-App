@@ -67,7 +67,7 @@ function Options({ children }) {
   return (
     <Container className={classes.container}>
       <Paper elevation={10} className={classes.paper}>
-        <form className={classes.root} noValidate autoComplete='off'>
+        {/* <form className={classes.root} noValidate autoComplete='off'>
           <Grid container className={classes.gridContainer}>
             <Grid item xs={12} md={6} className={classes.padding}>
               <Typography gutterBottom variant='h6'>
@@ -122,13 +122,13 @@ function Options({ children }) {
               )}
             </Grid>
           </Grid>
-        </form>
+        </form> */}
 
         {call.isReceivingCall && !callAccepted && (
           <div style={{ display: "flex", justifyContent: "space-around" }}>
-            <h1>{call.name} is calling:</h1>
+            <h1>{call.name} is trying to connect:</h1>
             <Button variant='contained' color='primary' onClick={answerCall}>
-              Answer
+              Connect
             </Button>
           </div>
         )}

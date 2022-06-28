@@ -18,7 +18,7 @@ function CreateQuery() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  console.log("context in create query", useContext(SocketContext));
+  // console.log("context in create query", useContext(SocketContext));
 
   const {
     me,
@@ -60,18 +60,26 @@ function CreateQuery() {
       dispatch(listTeachers(queries[0].category));
       // dispatch(getAllTeachers(queries[0].category));
     }
-  }, [dispatch, loading, queries, queriesSuccess, teacherLoading, teachers]);
+  }, [
+    dispatch,
+    loading,
+    queries,
+    queriesSuccess,
+    teacherLoading,
+    teachers,
+  ]);
 
   const handleDelete = () => {
     dispatch(deleteQuery(queries[0]._id));
     window.location.reload();
   };
 
-  const  handleClick = (id) => {
+  const handleClick = (id) => {
     // console.log("ID STATE", userIdState);
     // console.log("handle click is triggered", id);
     callUser(id);
-    const localStorageValue = JSON.parse(localStorage.getItem("users"))
+
+    console.log("call accepted", callAccepted);
 
     // console.log((localStorageValue), "localStorage");
 
