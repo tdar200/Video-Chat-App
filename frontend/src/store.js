@@ -30,6 +30,10 @@ import {
   roomDetailReducer
 } from "./reducers/roomReducers"
 
+import { callAcceptedReducer } from "./reducers/callReducers";
+
+
+
 const reducer = combineReducers({
   queryList: queryListReducer,
   queryDetail: queryDetailReducer,
@@ -40,6 +44,7 @@ const reducer = combineReducers({
   studentUpdate: studentUpdateReducer,
   roomCreate: roomCreateReducer,
   roomDetail: roomDetailReducer,
+  callAccepted : callAcceptedReducer,
   userLogin: userLoginReducer,
   userRegister: userRegisterReducer,
   userDetails: userDetailsReducer,

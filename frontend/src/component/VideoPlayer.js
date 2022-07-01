@@ -34,15 +34,23 @@ function VideoPlayer() {
     call,
   } = useContext(SocketContext);
 
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  console.log({userInfo})
+
   const classes = useStyles();
 
-  console.log("stream", stream);
+  // console.log("stream", stream);
 
   console.log("myvideo", myVideo);
+  console.log("userVideo", userVideo)
   console.log(useContext(SocketContext));
 
+  useEffect(() => {
 
-  console.log(callAccepted, "call accepted")
+  }, [userInfo])
+
+  // console.log(callAccepted, "call accepted")
 
   return (
     <Grid container className={classes.gridContainer}>
@@ -50,7 +58,7 @@ function VideoPlayer() {
         <Paper className={classes.paper}>
           <Grid item xs={12} md={6}>
             <Typography variant='h5' gutterBottom>
-              {name || "Name"}
+              {/* {userInfo?.name || "Name"} */}
             </Typography>
             <video
               playsInline
@@ -66,7 +74,7 @@ function VideoPlayer() {
         <Paper className={classes.paper}>
           <Grid item xs={12} md={6}>
             <Typography variant='h5' gutterBottom>
-              {call.name || "Name"}
+              {/* {userInfo?.name} */}
             </Typography>
             <video
               playsInline

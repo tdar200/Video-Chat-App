@@ -4,6 +4,7 @@ import { Button, Container } from "@material-ui/core";
 import { Assignment, Phone, PhoneDisabled } from "@material-ui/icons";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
+import VideoPlayer from "../component/VideoPlayer";
 
 function TeacherQuery() {
   const {
@@ -18,12 +19,13 @@ function TeacherQuery() {
     call,
   } = useContext(SocketContext);
 
-  console.log("call.isReceivingCall", call.isReceivingCall);
+  // console.log("call.isReceivingCall", call.isReceivingCall);
 
-  console.log("teacher context", useContext(SocketContext))
+  // console.log("teacher context", useContext(SocketContext))
 
   return (
     <Container>
+      <VideoPlayer />
       <Options>
         <Notifications />
         {/* {call.isReceivingCall && !callAccepted && (
@@ -35,16 +37,7 @@ function TeacherQuery() {
         </div>
       )} */}
       </Options>
-      {callAccepted && !callEnded ? (
-        <Button
-          variant='contained'
-          color='secondary'
-          startIcon={<PhoneDisabled fontSize='large' />}
-          fullWidth
-          onClick={leaveCall}>
-          Hang Up
-        </Button>
-      ) : null}
+   
     
     </Container>
   );

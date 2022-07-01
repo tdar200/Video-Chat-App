@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useMemo, useContext } from "react";
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useContext,
+  useCallback,
+} from "react";
 import { Table, Button, Container } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteQuery, listQueries } from "../actions/queryActions";
@@ -13,6 +19,7 @@ import { SocketContext } from "../Context";
 import data from "../MOCK_DATA.json";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
+import VideoPlayer from "../component/VideoPlayer";
 
 function CreateQuery() {
   const dispatch = useDispatch();
@@ -22,7 +29,6 @@ function CreateQuery() {
 
   const {
     me,
-    callAccepted,
     name,
     setName,
     leaveCall,
@@ -31,9 +37,13 @@ function CreateQuery() {
     answerCall,
     call,
     userIdState,
+    stream,
+    callAccepted,
   } = useContext(SocketContext);
 
-  // console.log("userIdState", userIdState)
+  console.log(useContext(SocketContext), "context front");
+
+  // console.log("userIdState", userIdState);
 
   const [idToCall, setIdToCall] = useState("");
 
@@ -47,6 +57,11 @@ function CreateQuery() {
 
   const roomCreate = useSelector((state) => state.roomCreate);
   const { room } = roomCreate;
+
+  // const callAccepted = useSelector((state) => state.callAccepted);
+  // const { callAccepted: CA } = callAccepted;
+
+  console.log(callAccepted);
 
   // console.log(roomCreate)
 
@@ -67,6 +82,7 @@ function CreateQuery() {
     queriesSuccess,
     teacherLoading,
     teachers,
+    callAccepted,
   ]);
 
   const handleDelete = () => {
@@ -74,16 +90,22 @@ function CreateQuery() {
     window.location.reload();
   };
 
+  // console.log("call accepted", callAccepted);
+
   const handleClick = (id) => {
     // console.log("ID STATE", userIdState);
     // console.log("handle click is triggered", id);
     callUser(id);
 
-    console.log("call accepted", callAccepted);
+    // console.log("call accepted", callAccepted);
 
     // console.log((localStorageValue), "localStorage");
 
-    // window.location.replace(`/rooms/${id}`);
+    // console.log(valueBack)
+
+    // setTimeout(() => {
+    //   // window.location.replace(`/rooms/${userIdState.userId}`);
+    // }, 10000);
   };
 
   const addCredit = () => {
@@ -161,8 +183,18 @@ function CreateQuery() {
           onHide={() => setShowModal(false)}
         />
       </Container>
-
-      <Notifications />
+      <VideoPlayer />
+      <Options>
+        <Notifications />
+        {/* {call.isReceivingCall && !callAccepted && (
+        <div style={{ display: "flex", justifyContent: "space-around" }}>
+          <h1>{call.name} is trying to connect:</h1>
+          <Button variant='contained' color='primary' onClick={answerCall}>
+            Connect
+          </Button>
+        </div>
+      )} */}
+      </Options>
     </>
   );
 }

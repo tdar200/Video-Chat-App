@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Options({ children }) {
+function Options() {
   const {
     me,
     callAccepted,
@@ -57,12 +57,17 @@ function Options({ children }) {
     userIdState,
   } = useContext(SocketContext);
 
+  console.log("context ", useContext(SocketContext));
+
   const [idToCall, setIdToCall] = useState("");
   const classes = useStyles();
 
-  console.log("id to call", idToCall);
+  function handleClick() {
+    answerCall();
+    // window.location.replace(`/rooms/${call.userId}`);
+  }
 
-  console.log("children", children);
+  // console.log("id to call", idToCall);
 
   return (
     <Container className={classes.container}>
@@ -99,17 +104,12 @@ function Options({ children }) {
                 onChange={(e) => setIdToCall(e.target.value)}
                 fullWidth
               />
-              {callAccepted && !callEnded ? (
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  startIcon={<PhoneDisabled fontSize='large' />}
-                  fullWidth
-                  onClick={leaveCall}
-                  className={classes.margin}>
-                  Hang Up
-                </Button>
-              ) : (
+          
+              
+              
+              
+              
+              : (
                 <Button
                   variant='contained'
                   color='primary'
@@ -127,10 +127,22 @@ function Options({ children }) {
         {call.isReceivingCall && !callAccepted && (
           <div style={{ display: "flex", justifyContent: "space-around" }}>
             <h1>{call.name} is trying to connect:</h1>
-            <Button variant='contained' color='primary' onClick={answerCall}>
+            <Button variant='contained' color='primary' onClick={handleClick}>
               Connect
             </Button>
           </div>
+        )}
+
+        {callAccepted && !callEnded && (
+          <Button
+            variant='contained'
+            color='secondary'
+            startIcon={<PhoneDisabled fontSize='large' />}
+            fullWidth
+            onClick={leaveCall}
+            className={classes.margin}>
+           Disconnect
+          </Button>
         )}
       </Paper>
     </Container>

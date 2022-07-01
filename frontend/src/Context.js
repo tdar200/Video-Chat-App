@@ -1,6 +1,8 @@
 import React, { createContext, useState, useRef, useEffect } from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
+import { useDispatch, useSelector } from "react-redux";
+import { callAcceptedAction } from "./actions/callActions";
 
 const SocketContext = createContext();
 
@@ -11,6 +13,10 @@ const socket = io("http://localhost:5000");
 // console.log("socket", socket);
 
 const ContextProvider = ({ children }) => {
+
+
+  const dispatch = useDispatch()
+
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const [callAccepted, setCallAccepted] = useState(false);
@@ -25,7 +31,7 @@ const ContextProvider = ({ children }) => {
   const userVideo = useRef();
   const connectionRef = useRef();
 
-  console.log("call accepted value context", callAccepted)
+  // console.log("call accepted value context", callAccepted);
 
   // console.log("user id", userIdState);
 
@@ -67,76 +73,97 @@ const ContextProvider = ({ children }) => {
     // }
     // );
 
+
+
     const sessionID = socket.id;
     if (socket?.id) {
       socket.emit("logged", {
         userId: userInfo?._id,
         socketId: sessionID,
       });
+
+      setUserIdState({ userId: userInfo?._id, socketId: sessionID });
     }
 
+    socket.on("callUser", ({ from, signal, userId }) => {
+      // console.log("this from the context, signal and data call user function", {
+      //   from,
+      //   signal,
+      // });
 
-    socket.on("callUser", ({ from, signal }) => {
-      console.log("this from the context, signal and data call user function", {
-        from,
-        signal,
-      });
-
-      setCall({ isReceivingCall: true, from, signal });
+      setCall({ isReceivingCall: true, from, signal, userId });
     });
 
- 
+    socket.on("callAccepted", () => {
+      console.log("first call accepted")
+      setCallAccepted(true);
+    })
+
     // return () => {
     //   setUserId();
     // };
 
     // });
-  }, [userInfo?._id, socket?.id, socket, callAccepted]);
+  }, [userInfo?._id, socket?.id]);
 
   const answerCall = () => {
     setCallAccepted(true);
-
+    dispatch(callAcceptedAction)
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on("signal", (data) => {
+
+      
+   
+      // setCallAccepted(true);
       socket.emit("answerCall", { signal: data, to: call.from });
     });
 
     peer.on("stream", (currentStream) => {
       userVideo.current.srcObject = currentStream;
+
+      // myVideo.current.srcObject = currentStream;
     });
+
+    // socket.on("callUser", ({ from, signal, userId }) => {
+    //   // console.log("this from the context, signal and data call user function", {
+    //   //   from,
+    //   //   signal,
+    //   // });
+
+    //   setCall({ isReceivingCall: true, from, signal, userId });
+    // });
+
+
+    socket.on("answerCall", () => {
+
+      console.log("callAccepted triggered context api")
+      setCallAccepted(true)
+
+    })
 
     peer.signal(call.signal);
 
     connectionRef.current = peer;
   };
 
-
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
-
-    // console.log("this is triggered, call user function");
-
-    // console.log("peer " ,peer)
 
     peer.on("signal", (data) => {
       socket.emit("callUser", {
         userToCall: id,
         signalData: data,
-        from: userInfo?.id,
+        from: userIdState.userId,
       });
     });
 
     peer.on("stream", (currentStream) => {
       userVideo.current.srcObject = currentStream;
-
-      // console.log(
-      //   "userVideo.current from callUser",
-      //   userVideo.current.srcObject
-      // );
     });
 
     socket.on("callAccepted", (signal) => {
+      dispatch(callAcceptedAction)
       setCallAccepted(true);
       peer.signal(signal);
     });
@@ -146,9 +173,7 @@ const ContextProvider = ({ children }) => {
 
   const leaveCall = () => {
     setCallEnded(true);
-
     connectionRef.current.destroy();
-
     window.location.reload();
   };
 
