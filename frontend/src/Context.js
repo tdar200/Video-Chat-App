@@ -6,7 +6,7 @@ import { callAcceptedAction } from "./actions/callActions";
 
 const SocketContext = createContext();
 
-const socket = io("http://localhost:5000");
+const socket = io("https://new-video-chat-app.herokuapp.com/");
 
 // console.log("list of sockets", socket.clients())
 
