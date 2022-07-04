@@ -36,15 +36,15 @@ function VideoPlayer() {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  console.log({userInfo})
+  // console.log({userInfo})
 
   const classes = useStyles();
 
   // console.log("stream", stream);
 
-  console.log("myvideo", myVideo);
-  console.log("userVideo", userVideo)
-  console.log(useContext(SocketContext));
+  // console.log("myvideo", myVideo);
+  // console.log("userVideo", userVideo)
+  // console.log(useContext(SocketContext));
 
   useEffect(() => {
 

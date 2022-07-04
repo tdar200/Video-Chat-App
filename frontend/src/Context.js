@@ -1,23 +1,27 @@
-import React, { createContext, useState, useRef, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import { io } from "socket.io-client";
 import Peer from "simple-peer";
 import { useDispatch, useSelector } from "react-redux";
 import { callAcceptedAction } from "./actions/callActions";
+import { updateTeacherAction } from "./actions/teacherActions";
+import useLocalStorage from "./hooks/useLocalStorage";
 
 const SocketContext = createContext();
 
-const socket = io("https://new-video-chat-app.herokuapp.com/");
-
-// console.log("list of sockets", socket.clients())
-
-// console.log("socket", socket);
-
 const ContextProvider = ({ children }) => {
-
-
-  const dispatch = useDispatch()
-
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const socket = io("http://localhost:5000", {
+    query: { id: userInfo?._id },
+  });
+
+  const dispatch = useDispatch();
 
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
@@ -26,54 +30,28 @@ const ContextProvider = ({ children }) => {
   const [call, setCall] = useState({});
   const [me, setMe] = useState("");
   const [userIdState, setUserIdState] = useState({});
+  const [callAcceptedOtherEnd, setCallAcceptedOtherEnd] = useState(false);
+
+  const [contacts, setContacts] = useLocalStorage("contacts", []);
+  const [conversations, setConversations] = useLocalStorage(
+    "conversations",
+    []
+  );
+  const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
 
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
 
-  // console.log("call accepted value context", callAccepted);
-
-  // console.log("user id", userIdState);
-
   useEffect(() => {
+    if (socket == null) return;
+
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
         myVideo.current.srcObject = currentStream;
       });
-
-    // socket.on("callUser", ({ from, signal }) => {
-    //   console.log("this from the context, signal and data call user function", {
-    //     from,
-    //     signal,
-    //   });
-
-    // socket.on("me", (id) => setMe(id));
-
-    // const setUserId = () => {
-    //   socket.emit("userId", userInfo?._id);
-    // };
-
-    // setUserId();
-
-    // socket.on("user", ({ userId, socketId }) => {
-    //   // console.log("user Id from fronted", {userId, socketId})
-    //   localStorage.setItem("users", JSON.stringify({ userId, socketId }));
-    //   setUserIdState({ userId, socketId });
-    // });
-    // socket.on("connect", () => {
-    // for (let key in socket) {
-    //   console.log({ key, val: socket[key] });
-    // }
-    // console.log("socket id", socket);
-
-    // socket.on("connect", () => {
-    //   socket.emit("connect", userIdState.userId, userIdState.socketId);
-    // }
-    // );
-
-
 
     const sessionID = socket.id;
     if (socket?.id) {
@@ -86,61 +64,118 @@ const ContextProvider = ({ children }) => {
     }
 
     socket.on("callUser", ({ from, signal, userId }) => {
-      // console.log("this from the context, signal and data call user function", {
-      //   from,
-      //   signal,
-      // });
-
       setCall({ isReceivingCall: true, from, signal, userId });
     });
 
     socket.on("callAccepted", () => {
-      console.log("first call accepted")
+      console.log("first call accepted");
       setCallAccepted(true);
-    })
+    });
 
-    // return () => {
-    //   setUserId();
-    // };
+    socket.on("call-accecpted-teacher", () => {
+      setCallAcceptedOtherEnd(true);
+    });
 
-    // });
+    socket.on("disconnect", () => {
+      const teacher = { id: userInfo?._id, from: null };
+
+      dispatch(updateTeacherAction(teacher));
+    });
+
+    socket.on("receive-message", addMessageToConversation);
+
+    return () => socket.off("receive-message");
   }, [userInfo?._id, socket?.id]);
+
+  function createConversation(recipients) {
+    setConversations((prevConversations) => {
+      return [...prevConversations, { recipients, messages: [] }];
+    });
+  }
+
+  function createContact(id, name) {
+    setContacts((prevContacts) => {
+      return [...prevContacts, { id, name }];
+    });
+  }
+
+  const addMessageToConversation = useCallback(
+    ({ recipients, text, sender }) => {
+      setConversations((prevConversations) => {
+        let madeChange = false;
+        const newMessage = { sender, text };
+        const newConversations = prevConversations.map((conversation) => {
+          if (arrayEquality(conversation.recipients, recipients)) {
+            madeChange = true;
+            return {
+              ...conversation,
+              messages: [...conversation.messages, newMessage],
+            };
+          }
+
+          return conversation;
+        });
+
+        if (madeChange) {
+          return newConversations;
+        } else {
+          return [...prevConversations, { recipients, messages: [newMessage] }];
+        }
+      });
+    },
+    [setConversations]
+  );
+
+  function sendMessage(recipients, text) {
+    socket.emit("send-message", { recipients, text });
+
+    addMessageToConversation({ recipients, text, sender: userInfo?._id });
+  }
+
+  const formattedConversations = conversations.map((conversation, index) => {
+    const recipients = conversation.recipients.map((recipient) => {
+      const contact = contacts.find((contact) => {
+        return contact.id === recipient;
+      });
+      const name = (contact && contact.name) || recipient;
+      return { id: recipient, name };
+    });
+
+    const messages = conversation.messages.map((message) => {
+      const contact = contacts.find((contact) => {
+        return contact.id === message.sender;
+      });
+      const name = (contact && contact.name) || message.sender;
+      const fromMe = userInfo?._id === message.sender;
+      return { ...message, senderName: name, fromMe };
+    });
+
+    const selected = index === selectedConversationIndex;
+    return { ...conversation, messages, recipients, selected };
+  });
 
   const answerCall = () => {
     setCallAccepted(true);
-    dispatch(callAcceptedAction)
+    dispatch(callAcceptedAction);
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on("signal", (data) => {
-
-      
-   
       // setCallAccepted(true);
-      socket.emit("answerCall", { signal: data, to: call.from });
+      socket.emit("answerCall", {
+        signal: data,
+        to: call.from,
+        from: userInfo?._id,
+      });
     });
 
     peer.on("stream", (currentStream) => {
       userVideo.current.srcObject = currentStream;
-
-      // myVideo.current.srcObject = currentStream;
     });
 
-    // socket.on("callUser", ({ from, signal, userId }) => {
-    //   // console.log("this from the context, signal and data call user function", {
-    //   //   from,
-    //   //   signal,
-    //   // });
-
-    //   setCall({ isReceivingCall: true, from, signal, userId });
-    // });
-
-
     socket.on("answerCall", () => {
-
-      console.log("callAccepted triggered context api")
-      setCallAccepted(true)
-
-    })
+      console.log("callAccepted triggered context api");
+      setCallAccepted(true);
+    });
 
     peer.signal(call.signal);
 
@@ -150,11 +185,13 @@ const ContextProvider = ({ children }) => {
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
 
+    console.log("this function call user", { id, userId: userInfo?._id });
+
     peer.on("signal", (data) => {
       socket.emit("callUser", {
         userToCall: id,
         signalData: data,
-        from: userIdState.userId,
+        from: userInfo?._id,
       });
     });
 
@@ -163,7 +200,8 @@ const ContextProvider = ({ children }) => {
     });
 
     socket.on("callAccepted", (signal) => {
-      dispatch(callAcceptedAction)
+      console.log("this function is triggerd 2");
+      dispatch(callAcceptedAction);
       setCallAccepted(true);
       peer.signal(signal);
     });
@@ -171,9 +209,14 @@ const ContextProvider = ({ children }) => {
     connectionRef.current = peer;
   };
 
-  const leaveCall = () => {
+  const leaveCall = (id) => {
     setCallEnded(true);
     connectionRef.current.destroy();
+
+    const teacher = { id, from: null };
+
+    dispatch(updateTeacherAction(teacher));
+
     window.location.reload();
   };
 
@@ -193,10 +236,30 @@ const ContextProvider = ({ children }) => {
         leaveCall,
         answerCall,
         userIdState,
+        callAcceptedOtherEnd,
+        conversations,
+        createConversation,
+        selectConversationIndex: setSelectedConversationIndex,
+        sendMessage,
+        selectedConversation: formattedConversations[selectedConversationIndex],
+        createConversation,
+        contacts,
+        createContact,
       }}>
       {children}
     </SocketContext.Provider>
   );
 };
+
+function arrayEquality(a, b) {
+  if (a.length !== b.length) return false;
+
+  a.sort();
+  b.sort();
+
+  return a.every((element, index) => {
+    return element === b[index];
+  });
+}
 
 export { ContextProvider, SocketContext };

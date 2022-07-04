@@ -8,7 +8,7 @@ const errorHandler = require("./middleware/errorMiddleware");
 const app = express();
 const server = require("http").Server(app);
 // const io = require("socket.io")(server)
-const { v4: uuidv4 } = require("uuid");
+// const { v4: uuidv4 } = require("uuid");
 
 dotenv.config();
 connectDB();
@@ -44,18 +44,17 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/rooms", roomRoutes);
 
-if (process.env.NODE_ENV === "PRODUCTION") {
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
+// if (process.env.NODE_ENV === "PRODUCTION") {
+//   app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"))
-  );
-} else {
-  app.get("/", (req, res) => {
-    res.send("API is running....");
-  });
-}
-
+//   app.get("*", (req, res) =>
+//     res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"))
+//   );
+// } else {
+//   app.get("/", (req, res) => {
+//     res.send("API is running....");
+//   });
+// }
 
 app.use(notFound);
 app.use(errorHandler);
@@ -68,13 +67,19 @@ const users = {
 
 io.on("connection", async (socket) => {
   // console.log(socket, "socket backend")
-  socket.on("logged", ({userId, socketId}) => {
+
+  const id = socket.handshake.query.id;
+  socket.join(id);
+
+  // console.log("id backned", id);
+
+  socket.on("logged", ({ userId, socketId }) => {
     // console.log("connection", socketId, userId);
-    users[userId] =  socketId ;
+    users[userId] = socketId;
   });
 
   // console.log("users", users)
-  
+
   socket.on("userId", (userId, socketId) => {
     // console.log(userId, "user id from backend");
     socket.emit("user", {
@@ -82,13 +87,11 @@ io.on("connection", async (socket) => {
       socketId: users[userId],
       // sockets: JSON.stringify(socket),
     });
+
     // socket.emit("me", socket.handshake.query.id);
   });
 
-
   // console.log(users,"users")
-
-
 
   // socket.on("me", () => {
   //   socket.broadcast.emit("me", userId);
@@ -109,19 +112,33 @@ io.on("connection", async (socket) => {
     // console.log("backend from ", from)
 
     // console.log("call user", users[from])
-    
+
     // console.log("backend data", { userToCall, signalData, from });
-    io.to(users[userToCall]).emit("callUser", {    
+    io.to(userToCall).emit("callUser", {
       signal: signalData,
-      from: users[from],
-      userId: from
+      from: from,
+      userId: from,
     });
   });
 
   socket.on("answerCall", (data) => {
-    console.log("backend answer call", data);
-    io.to(data.to).emit("callAccepted",  data.signal);
+    console.log("backend answer call", data.from);
+    io.to(data.to).emit("callAccepted", data.signal);
+
+    io.to(data.from).emit("call-accecpted-teacher");
   });
+
+
+  socket.on('send-message', ({ recipients, text }) => {
+    recipients.forEach(recipient => {
+      const newRecipients = recipients.filter(r => r !== recipient)
+      newRecipients.push(id)
+      socket.broadcast.to(recipient).emit('receive-message', {
+        recipients: newRecipients, sender: id, text
+      })
+    })
+  })
+
 });
 
 server.listen(

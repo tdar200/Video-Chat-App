@@ -11,6 +11,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Assignment, Phone, PhoneDisabled } from "@material-ui/icons";
 import { SocketContext } from "../Context";
+import { updateTeacherAction } from "../actions/teacherActions";
+import { useDispatch, useSelector } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -57,13 +59,24 @@ function Options() {
     userIdState,
   } = useContext(SocketContext);
 
-  console.log("context ", useContext(SocketContext));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const dispatch = useDispatch();
+
+  // console.log("context ", useContext(SocketContext));
 
   const [idToCall, setIdToCall] = useState("");
   const classes = useStyles();
 
   function handleClick() {
     answerCall();
+
+    if (call.isReceivingCall && call.from) {
+      const teacher = { id: userInfo?._id, from: call.from };
+
+      dispatch(updateTeacherAction(teacher));
+    }
+
     // window.location.replace(`/rooms/${call.userId}`);
   }
 
@@ -139,9 +152,9 @@ function Options() {
             color='secondary'
             startIcon={<PhoneDisabled fontSize='large' />}
             fullWidth
-            onClick={leaveCall}
+            onClick={() => leaveCall(userInfo?._id)}
             className={classes.margin}>
-           Disconnect
+            Disconnect
           </Button>
         )}
       </Paper>

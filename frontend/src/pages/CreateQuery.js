@@ -15,12 +15,15 @@ import { createRoom } from "../actions/roomActions";
 import { useNavigate } from "react-router-dom";
 import ModalComponent from "../component/ModalComponent";
 import { SocketContext } from "../Context";
+import { getTeacherDetails } from "../actions/teacherActions";
+import Sidebar from "../component/Sidebar";
+
 
 import data from "../MOCK_DATA.json";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
 import VideoPlayer from "../component/VideoPlayer";
-
+import OpenConversation from "../component/OpenConversation";
 function CreateQuery() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -39,9 +42,11 @@ function CreateQuery() {
     userIdState,
     stream,
     callAccepted,
+    callAcceptedOtherEnd,
+    selectedConversation,
   } = useContext(SocketContext);
 
-  console.log(useContext(SocketContext), "context front");
+  // console.log(useContext(SocketContext), "context front");
 
   // console.log("userIdState", userIdState);
 
@@ -58,10 +63,13 @@ function CreateQuery() {
   const roomCreate = useSelector((state) => state.roomCreate);
   const { room } = roomCreate;
 
+  const teacherDetail = useSelector((state) => state.teacherDetail);
+  const { teacher } = teacherDetail;
+
   // const callAccepted = useSelector((state) => state.callAccepted);
   // const { callAccepted: CA } = callAccepted;
 
-  console.log(callAccepted);
+  // console.log(callAccepted);
 
   // console.log(roomCreate)
 
@@ -75,6 +83,10 @@ function CreateQuery() {
       dispatch(listTeachers(queries[0].category));
       // dispatch(getAllTeachers(queries[0].category));
     }
+
+    // if (teacher?.call_connected) {
+    //   window.location.replace(`/rooms/${idToCall}`);
+    // }
   }, [
     dispatch,
     loading,
@@ -83,6 +95,10 @@ function CreateQuery() {
     teacherLoading,
     teachers,
     callAccepted,
+    callAcceptedOtherEnd,
+    teacherDetail,
+    teacher?.call_connected,
+    idToCall,
   ]);
 
   const handleDelete = () => {
@@ -92,20 +108,16 @@ function CreateQuery() {
 
   // console.log("call accepted", callAccepted);
 
+  console.log("teacher detail", teacherDetail);
+
   const handleClick = (id) => {
     // console.log("ID STATE", userIdState);
     // console.log("handle click is triggered", id);
+    console.log("call accepted", teacher);
     callUser(id);
+    dispatch(getTeacherDetails(id));
 
-    // console.log("call accepted", callAccepted);
-
-    // console.log((localStorageValue), "localStorage");
-
-    // console.log(valueBack)
-
-    // setTimeout(() => {
-    //   // window.location.replace(`/rooms/${userIdState.userId}`);
-    // }, 10000);
+    setIdToCall(id);
   };
 
   const addCredit = () => {
@@ -195,6 +207,10 @@ function CreateQuery() {
         </div>
       )} */}
       </Options>
+      <div className='d-flex' >
+        <Sidebar id={userInfo?._id} />
+        {selectedConversation && <OpenConversation />}
+      </div>
     </>
   );
 }

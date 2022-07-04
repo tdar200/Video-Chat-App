@@ -54,13 +54,17 @@ const teacherSchema = mongoose.Schema({
 
   subject_category: {
     type: String,
-    required: true
+    required: true,
   },
 
   gender: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
+
+  call_connected: {
+    type: String,
+  },
 });
 
 const Teacher = mongoose.model("Teacher", teacherSchema);

@@ -5,8 +5,12 @@ import { Assignment, Phone, PhoneDisabled } from "@material-ui/icons";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
 import VideoPlayer from "../component/VideoPlayer";
+import Sidebar from "../component/Sidebar";
+import OpenConversation from "../component/OpenConversation";
 
 function TeacherQuery() {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
   const {
     me,
     callAccepted,
@@ -17,6 +21,7 @@ function TeacherQuery() {
     callEnded,
     answerCall,
     call,
+    selectedConversation,
   } = useContext(SocketContext);
 
   // console.log("call.isReceivingCall", call.isReceivingCall);
@@ -37,8 +42,10 @@ function TeacherQuery() {
         </div>
       )} */}
       </Options>
-   
-    
+      <div className='d-flex' >
+        <Sidebar id={userInfo?._id} />
+        {selectedConversation && <OpenConversation />}
+      </div>
     </Container>
   );
 }
