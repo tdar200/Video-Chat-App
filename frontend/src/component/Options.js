@@ -7,6 +7,7 @@ import {
   Container,
   Paper,
 } from "@material-ui/core";
+import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Assignment, Phone, PhoneDisabled } from "@material-ui/icons";
@@ -59,6 +60,7 @@ function Options() {
     userIdState,
   } = useContext(SocketContext);
 
+  const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const dispatch = useDispatch();
@@ -77,7 +79,7 @@ function Options() {
       dispatch(updateTeacherAction(teacher));
     }
 
-    // window.location.replace(`/rooms/${call.userId}`);
+    navigate(`/rooms/${call.userId}`);
   }
 
   // console.log("id to call", idToCall);
@@ -117,11 +119,6 @@ function Options() {
                 onChange={(e) => setIdToCall(e.target.value)}
                 fullWidth
               />
-          
-              
-              
-              
-              
               : (
                 <Button
                   variant='contained'

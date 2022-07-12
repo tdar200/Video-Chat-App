@@ -54,6 +54,10 @@ const ContextProvider = ({ children }) => {
       });
 
     const sessionID = socket.id;
+
+// getting the call_Accepted_signal
+
+
     if (socket?.id) {
       socket.emit("logged", {
         userId: userInfo?._id,
@@ -86,6 +90,14 @@ const ContextProvider = ({ children }) => {
 
     return () => socket.off("receive-message");
   }, [userInfo?._id, socket?.id]);
+
+  useEffect(() => {
+    if (performance.getEntriesByType("navigation")[0].type === "reload") {
+      const teacher = { id: userInfo?._id, from: null };
+
+      dispatch(updateTeacherAction(teacher));
+    }
+  }, []);
 
   function createConversation(recipients) {
     setConversations((prevConversations) => {
@@ -176,6 +188,7 @@ const ContextProvider = ({ children }) => {
       console.log("callAccepted triggered context api");
       setCallAccepted(true);
     });
+
 
     peer.signal(call.signal);
 

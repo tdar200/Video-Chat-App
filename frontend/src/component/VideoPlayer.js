@@ -24,15 +24,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function VideoPlayer() {
-  const {
-    name,
-    callAccepted,
-    myVideo,
-    userVideo,
-    callEnded,
-    stream,
-    call,
-  } = useContext(SocketContext);
+  console.log("sshutah is baclk");
+  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } =
+    useContext(SocketContext);
+
+  console.log({ ...useContext(SocketContext) });
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -46,9 +42,7 @@ function VideoPlayer() {
   // console.log("userVideo", userVideo)
   // console.log(useContext(SocketContext));
 
-  useEffect(() => {
-
-  }, [userInfo])
+  useEffect(() => {}, [userInfo]);
 
   // console.log(callAccepted, "call accepted")
 

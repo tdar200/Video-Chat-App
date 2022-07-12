@@ -24,10 +24,6 @@ function TeacherQuery() {
     selectedConversation,
   } = useContext(SocketContext);
 
-  // console.log("call.isReceivingCall", call.isReceivingCall);
-
-  // console.log("teacher context", useContext(SocketContext))
-
   return (
     <Container>
       <VideoPlayer />

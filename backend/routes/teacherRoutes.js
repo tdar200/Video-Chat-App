@@ -15,7 +15,6 @@ router.route("/detail/:id").get(
     });
 
     // console.log("teacher id ", req.params.id)
-
     // console.log("teacher",teacher)
 
     if (teacher) {
@@ -30,9 +29,6 @@ router.route("/detail/:id").get(
 router.route("/update/:id/:userId").put(
   protect,
   asyncHandler(async (req, res) => {
-    console.log(typeof req.params.userId);
-
-    console.log(req.params.id, "teacher id");
 
     const teacher = await Teacher.findOne({
       user: req.params.id,
@@ -42,40 +38,22 @@ router.route("/update/:id/:userId").put(
       call_connected: req.params.id,
     });
 
-    console.log("user id", req.params.userId);
-
-    // aggregate([
-    //   {
-    //     $match: {
-    //       user: new ObjectId(`${req.params.id}`),
-    //     },
-    //   },
-    // ]);
-
-    // console.log(teacher, "teacher backend");
+    console.log("student obj", student);
 
     if (teacher && req.params.userId !== "null") {
-      // console.log("first function is running");
-
       teacher.call_connected = req.params.userId;
 
-      // console.log(teacher, "inside if statement")
-      const updatedTeacher =
-        // await teacher.save();
-
-        await Teacher.findOneAndUpdate(
-          {
-            _id: teacher._id,
+      const updatedTeacher = await Teacher.findOneAndUpdate(
+        {
+          _id: teacher._id,
+        },
+        {
+          $set: {
+            call_connected: req.params.userId,
           },
-          {
-            $set: {
-              call_connected: req.params.userId,
-            },
-          },
-          { useFindAndModify: false }
-        );
-
-      // console.log("updatedTeacher", updatedTeacher);
+        },
+        { useFindAndModify: false }
+      );
 
       res.json(updatedTeacher);
     } else if (teacher && req.params.userId === "null") {
@@ -85,21 +63,28 @@ router.route("/update/:id/:userId").put(
           _id: teacher._id,
         },
         { $unset: { call_connected: true } },
-        false,
-        true
-      
+        {
+          upsert: true,
+        }
       );
 
-      console.log(teacher, "teacher");
+      res.status(200);
+
+      // console.log(teacher, "teacher");
     } else if (student && req.params.userId === "null") {
       await Teacher.findOneAndUpdate(
         {
-          _id: teacher._id,
+          call_connected: student.call_connected,
         },
         {
           $unset: "call_connected",
+        },
+        {
+          upsert: true,
         }
       );
+
+      res.status(200);
     } else {
       res.status(404);
       throw new Error("Teacher not found");

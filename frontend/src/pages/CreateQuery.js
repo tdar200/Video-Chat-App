@@ -18,12 +18,12 @@ import { SocketContext } from "../Context";
 import { getTeacherDetails } from "../actions/teacherActions";
 import Sidebar from "../component/Sidebar";
 
-
 import data from "../MOCK_DATA.json";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
 import VideoPlayer from "../component/VideoPlayer";
 import OpenConversation from "../component/OpenConversation";
+import QueryDetailsPage from "./QueryDetailsPage";
 function CreateQuery() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -58,20 +58,13 @@ function CreateQuery() {
   const { loading, queries, success: queriesSuccess } = queryList;
 
   const teacherList = useSelector((state) => state.teacherList);
-  const { loading: teacherLoading, teachers } = teacherList;
+  const { loading: teachersLoading, teachers } = teacherList;
 
   const roomCreate = useSelector((state) => state.roomCreate);
   const { room } = roomCreate;
 
   const teacherDetail = useSelector((state) => state.teacherDetail);
-  const { teacher } = teacherDetail;
-
-  // const callAccepted = useSelector((state) => state.callAccepted);
-  // const { callAccepted: CA } = callAccepted;
-
-  // console.log(callAccepted);
-
-  // console.log(roomCreate)
+  const { loading: teacherLoading, teacher } = teacherDetail;
 
   const [showModal, setShowModal] = useState(false);
 
@@ -79,27 +72,41 @@ function CreateQuery() {
     if (queries?.length === 0 && !loading && !queriesSuccess) {
       dispatch(listQueries());
     }
-    if (teachers?.length === 0 && !teacherLoading && queries?.length > 0) {
+    if (teachers?.length === 0 && !teachersLoading && queries?.length > 0) {
       dispatch(listTeachers(queries[0].category));
       // dispatch(getAllTeachers(queries[0].category));
     }
-
-    // if (teacher?.call_connected) {
-    //   window.location.replace(`/rooms/${idToCall}`);
-    // }
   }, [
     dispatch,
     loading,
     queries,
     queriesSuccess,
-    teacherLoading,
+    teachersLoading,
     teachers,
     callAccepted,
     callAcceptedOtherEnd,
-    teacherDetail,
-    teacher?.call_connected,
-    idToCall,
   ]);
+
+  useEffect(() => {
+    if (idToCall && !teacher && teacherLoading) {
+      dispatch(getTeacherDetails(idToCall));
+    }
+  }, [dispatch, idToCall, teacher, teacherLoading]);
+
+  useEffect(() => {
+    if (teacher?.call_connected) {
+      navigate(`/rooms/${idToCall}`);
+    }
+    console.log({ teacher, idToCall });
+  }, [idToCall, teacher?.call_connected]);
+
+  // useEffect(() => {
+  //   if (performance.getEntriesByType("navigation")[0].type === "reload") {
+  //     console.log("This page is reloaded");
+  //   } else {
+  //     console.log("This page is not reloaded");
+  //   }
+  // }, []);
 
   const handleDelete = () => {
     dispatch(deleteQuery(queries[0]._id));
@@ -108,17 +115,23 @@ function CreateQuery() {
 
   // console.log("call accepted", callAccepted);
 
-  console.log("teacher detail", teacherDetail);
+  // console.log("teacher detail", teacherDetail);
 
   const handleClick = (id) => {
-    // console.log("ID STATE", userIdState);
-    // console.log("handle click is triggered", id);
-    console.log("call accepted", teacher);
+    // console.log("call accepted", teacher);
     callUser(id);
-    dispatch(getTeacherDetails(id));
+
+    console.log("teacher", teacher);
+    navigate(`/rooms/${id}`);
 
     setIdToCall(id);
   };
+
+  useEffect(() => {
+    if (!teacher?.call_connected) return;
+
+    window.location.replace(`/rooms/${idToCall}`);
+  }, [idToCall, teacher?.call_connected]);
 
   const addCredit = () => {
     const student = {
@@ -129,6 +142,9 @@ function CreateQuery() {
     dispatch(studentUpdate(student));
     window.location.reload();
   };
+
+  console.log("teacher outside", teacherDetail);
+  console.log(idToCall, "id to call");
 
   return (
     <>
@@ -185,7 +201,6 @@ function CreateQuery() {
           <Button onClick={() => setShowModal(true)} variant='secondary'>
             Add Question
           </Button>
-
           <Button onClick={addCredit}>Add Credit</Button>
         </div>
 
@@ -198,16 +213,8 @@ function CreateQuery() {
       <VideoPlayer />
       <Options>
         <Notifications />
-        {/* {call.isReceivingCall && !callAccepted && (
-        <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <h1>{call.name} is trying to connect:</h1>
-          <Button variant='contained' color='primary' onClick={answerCall}>
-            Connect
-          </Button>
-        </div>
-      )} */}
       </Options>
-      <div className='d-flex' >
+      <div className='d-flex'>
         <Sidebar id={userInfo?._id} />
         {selectedConversation && <OpenConversation />}
       </div>

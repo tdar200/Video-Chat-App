@@ -14,7 +14,9 @@ function QueryDetailsPage() {
   let queryId = params.id;
   const dispatch = useDispatch();
 
-  const queryDetails = useSelector((state) => state.queryDetail);
+  const queryDetails = useSelector((state) => state);
+
+  console.log({ queryDetails });
   const { loading, query, error } = queryDetails;
 
   useEffect(() => {}, [dispatch, queryId]);
@@ -22,7 +24,10 @@ function QueryDetailsPage() {
   return (
     <div>
       <VideoPlayer />
-      <Notifications />
+
+      <Options>
+        <Notifications />
+      </Options>
     </div>
   );
 }
