@@ -107,7 +107,7 @@ const ContextProvider = ({ children }) => {
     }
 
     socket.on("callUser", ({ from, signal, userId }) => {
-      console.log(from, " callUser id ")
+    
       setCall({ isReceivingCall: true, from, signal, userId });
     });
 
@@ -178,10 +178,13 @@ const ContextProvider = ({ children }) => {
     // console.log("callWas accccpected");
     setCallAccepted(true);
     dispatch(callAcceptedAction);
+    setUserId(call.from)
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on("signal", (data) => {
       // setCallAccepted(true);
+
+      console.log(data, "data from context")
       socket.emit("answerCall", {
         signal: data,
         to: call.from,

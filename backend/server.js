@@ -44,17 +44,17 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/rooms", roomRoutes);
 
-// if (process.env.NODE_ENV === "PRODUCTION") {
-//   app.use(express.static(path.join(__dirname, "../frontend/build")));
+if (process.env.NODE_ENV === "PRODUCTION") {
+  app.use(express.static(path.join(__dirname, "../frontend/build")));
 
-//   app.get("*", (req, res) =>
-//     res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"))
-//   );
-// } else {
-//   app.get("/", (req, res) => {
-//     res.send("API is running....");
-//   });
-// }
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "../frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running....");
+  });
+}
 
 app.use(notFound);
 app.use(errorHandler);
