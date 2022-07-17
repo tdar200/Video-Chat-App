@@ -124,21 +124,21 @@ io.on("connection", async (socket) => {
   socket.on("answerCall", (data) => {
     console.log("backend answer call", data.from);
     io.to(data.to).emit("callAccepted", data.signal);
-
     io.to(data.from).emit("call-accecpted-teacher");
+    io.to(data.to).emit("call-accecpted-teacher");
   });
 
-
-  socket.on('send-message', ({ recipients, text }) => {
-    recipients.forEach(recipient => {
-      const newRecipients = recipients.filter(r => r !== recipient)
-      newRecipients.push(id)
-      socket.broadcast.to(recipient).emit('receive-message', {
-        recipients: newRecipients, sender: id, text
-      })
-    })
-  })
-
+  socket.on("send-message", ({ recipients, text }) => {
+    recipients.forEach((recipient) => {
+      const newRecipients = recipients.filter((r) => r !== recipient);
+      newRecipients.push(id);
+      socket.broadcast.to(recipient).emit("receive-message", {
+        recipients: newRecipients,
+        sender: id,
+        text,
+      });
+    });
+  });
 });
 
 server.listen(

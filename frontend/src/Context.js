@@ -31,6 +31,7 @@ const ContextProvider = ({ children }) => {
   const [me, setMe] = useState("");
   const [userIdState, setUserIdState] = useState({});
   const [callAcceptedOtherEnd, setCallAcceptedOtherEnd] = useState(false);
+  const [userId, setUserId] = useState("")
 
   const [contacts, setContacts] = useLocalStorage("contacts", []);
   const [conversations, setConversations] = useLocalStorage(
@@ -42,74 +43,6 @@ const ContextProvider = ({ children }) => {
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
-
-  useEffect(() => {
-    if (socket == null) return;
-
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        setStream(currentStream);
-        myVideo.current.srcObject = currentStream;
-      });
-
-    const sessionID = socket.id;
-
-// getting the call_Accepted_signal
-
-
-    if (socket?.id) {
-      socket.emit("logged", {
-        userId: userInfo?._id,
-        socketId: sessionID,
-      });
-
-      setUserIdState({ userId: userInfo?._id, socketId: sessionID });
-    }
-
-    socket.on("callUser", ({ from, signal, userId }) => {
-      setCall({ isReceivingCall: true, from, signal, userId });
-    });
-
-    socket.on("callAccepted", () => {
-      console.log("first call accepted");
-      setCallAccepted(true);
-    });
-
-    socket.on("call-accecpted-teacher", () => {
-      setCallAcceptedOtherEnd(true);
-    });
-
-    socket.on("disconnect", () => {
-      const teacher = { id: userInfo?._id, from: null };
-
-      dispatch(updateTeacherAction(teacher));
-    });
-
-    socket.on("receive-message", addMessageToConversation);
-
-    return () => socket.off("receive-message");
-  }, [userInfo?._id, socket?.id]);
-
-  useEffect(() => {
-    if (performance.getEntriesByType("navigation")[0].type === "reload") {
-      const teacher = { id: userInfo?._id, from: null };
-
-      dispatch(updateTeacherAction(teacher));
-    }
-  }, []);
-
-  function createConversation(recipients) {
-    setConversations((prevConversations) => {
-      return [...prevConversations, { recipients, messages: [] }];
-    });
-  }
-
-  function createContact(id, name) {
-    setContacts((prevContacts) => {
-      return [...prevContacts, { id, name }];
-    });
-  }
 
   const addMessageToConversation = useCallback(
     ({ recipients, text, sender }) => {
@@ -139,9 +72,84 @@ const ContextProvider = ({ children }) => {
   );
 
   function sendMessage(recipients, text) {
+    console.log("recipients from contec", recipients)
     socket.emit("send-message", { recipients, text });
 
     addMessageToConversation({ recipients, text, sender: userInfo?._id });
+  }
+
+  console.log("user ID FROM Context", userId)
+
+  useEffect(() => {
+    if (socket == null) return;
+
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        if (currentStream) {
+          // console.log("stream from context", currentStream);
+          setStream(currentStream);
+          myVideo.current.srcObject = currentStream;
+        }
+      });
+
+    const sessionID = socket.id;
+
+    // getting the call_Accepted_signal
+
+    if (socket?.id) {
+      socket.emit("logged", {
+        userId: userInfo?._id,
+        socketId: sessionID,
+      });
+
+      setUserIdState({ userId: userInfo?._id, socketId: sessionID });
+    }
+
+    socket.on("callUser", ({ from, signal, userId }) => {
+      console.log(from, " callUser id ")
+      setCall({ isReceivingCall: true, from, signal, userId });
+    });
+
+    socket.on("callAccepted", () => {
+      // console.log("first call accepted");
+      setCallAccepted(true);
+    });
+
+    socket.on("call-accecpted-teacher", () => {
+      // console.log("accepted the call aand connection established");
+      setCallAcceptedOtherEnd(true);
+    });
+
+    socket.on("disconnect", () => {
+      const teacher = { id: userInfo?._id, from: null };
+
+      dispatch(updateTeacherAction(teacher));
+    });
+
+    socket.on("receive-message", addMessageToConversation);
+
+    return () => socket.off("receive-message");
+  }, [userInfo?._id, socket.id]);
+
+  useEffect(() => {
+    if (performance.getEntriesByType("navigation")[0].type === "reload") {
+      const teacher = { id: userInfo?._id, from: null };
+
+      dispatch(updateTeacherAction(teacher));
+    }
+  }, [dispatch, userInfo?._id]);
+
+  function createConversation(recipients) {
+    setConversations((prevConversations) => {
+      return [...prevConversations, { recipients, messages: [] }];
+    });
+  }
+
+  function createContact(id, name) {
+    setContacts((prevContacts) => {
+      return [...prevContacts, { id, name }];
+    });
   }
 
   const formattedConversations = conversations.map((conversation, index) => {
@@ -167,6 +175,7 @@ const ContextProvider = ({ children }) => {
   });
 
   const answerCall = () => {
+    // console.log("callWas accccpected");
     setCallAccepted(true);
     dispatch(callAcceptedAction);
     const peer = new Peer({ initiator: false, trickle: false, stream });
@@ -177,18 +186,28 @@ const ContextProvider = ({ children }) => {
         signal: data,
         to: call.from,
         from: userInfo?._id,
+        callAccepted: true,
       });
     });
+
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        if (currentStream) {
+          // console.log("stream from context", currentStream);
+          setStream(currentStream);
+          myVideo.current.srcObject = currentStream;
+        }
+      });
 
     peer.on("stream", (currentStream) => {
       userVideo.current.srcObject = currentStream;
     });
 
     socket.on("answerCall", () => {
-      console.log("callAccepted triggered context api");
+      // console.log("accepted ma ");
       setCallAccepted(true);
     });
-
 
     peer.signal(call.signal);
 
@@ -198,8 +217,6 @@ const ContextProvider = ({ children }) => {
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
 
-    console.log("this function call user", { id, userId: userInfo?._id });
-
     peer.on("signal", (data) => {
       socket.emit("callUser", {
         userToCall: id,
@@ -208,12 +225,23 @@ const ContextProvider = ({ children }) => {
       });
     });
 
-    peer.on("stream", (currentStream) => {
-      userVideo.current.srcObject = currentStream;
-    });
-
     socket.on("callAccepted", (signal) => {
-      console.log("this function is triggerd 2");
+      // console.log("this function is triggerd 2");
+
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((currentStream) => {
+          if (currentStream) {
+            // console.log("stream from context", currentStream);
+            setStream(currentStream);
+            myVideo.current.srcObject = currentStream;
+          }
+        });
+
+      peer.on("stream", (currentStream) => {
+        userVideo.current.srcObject = currentStream;
+      });
+
       dispatch(callAcceptedAction);
       setCallAccepted(true);
       peer.signal(signal);
@@ -255,9 +283,9 @@ const ContextProvider = ({ children }) => {
         selectConversationIndex: setSelectedConversationIndex,
         sendMessage,
         selectedConversation: formattedConversations[selectedConversationIndex],
-        createConversation,
         contacts,
         createContact,
+        setUserId
       }}>
       {children}
     </SocketContext.Provider>

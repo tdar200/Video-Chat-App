@@ -44,6 +44,8 @@ function CreateQuery() {
     callAccepted,
     callAcceptedOtherEnd,
     selectedConversation,
+    myVideo,
+    setUserId
   } = useContext(SocketContext);
 
   // console.log(useContext(SocketContext), "context front");
@@ -94,11 +96,10 @@ function CreateQuery() {
   }, [dispatch, idToCall, teacher, teacherLoading]);
 
   useEffect(() => {
-    if (teacher?.call_connected) {
+    if (idToCall && callAccepted) {
       navigate(`/rooms/${idToCall}`);
     }
-    console.log({ teacher, idToCall });
-  }, [idToCall, teacher?.call_connected]);
+  }, [idToCall, callAccepted, navigate]);
 
   // useEffect(() => {
   //   if (performance.getEntriesByType("navigation")[0].type === "reload") {
@@ -119,10 +120,11 @@ function CreateQuery() {
 
   const handleClick = (id) => {
     // console.log("call accepted", teacher);
+    setUserId(id)
     callUser(id);
 
-    console.log("teacher", teacher);
-    navigate(`/rooms/${id}`);
+    // console.log("teacher", teacher);
+    // navigate(`/rooms/${id}`);
 
     setIdToCall(id);
   };
@@ -130,8 +132,8 @@ function CreateQuery() {
   useEffect(() => {
     if (!teacher?.call_connected) return;
 
-    window.location.replace(`/rooms/${idToCall}`);
-  }, [idToCall, teacher?.call_connected]);
+    navigate(`/rooms/${idToCall}`);
+  }, [idToCall, navigate, teacher?.call_connected]);
 
   const addCredit = () => {
     const student = {
@@ -210,14 +212,11 @@ function CreateQuery() {
           onHide={() => setShowModal(false)}
         />
       </Container>
-      <VideoPlayer />
-      <Options>
-        <Notifications />
-      </Options>
-      <div className='d-flex'>
+
+      {/* <div className='d-flex'>
         <Sidebar id={userInfo?._id} />
         {selectedConversation && <OpenConversation />}
-      </div>
+      </div> */}
     </>
   );
 }

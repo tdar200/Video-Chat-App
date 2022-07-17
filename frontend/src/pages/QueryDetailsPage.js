@@ -8,15 +8,27 @@ import { useParams } from "react-router-dom";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
 import { SocketContext } from "../Context";
+import Sidebar from "../component/Sidebar";
+import OpenConversation from "../component/OpenConversation";
 
 function QueryDetailsPage() {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   let params = useParams();
   let queryId = params.id;
   const dispatch = useDispatch();
 
   const queryDetails = useSelector((state) => state);
 
-  console.log({ queryDetails });
+  const {selectedConversation, myVideo, stream, userVideo} = useContext(SocketContext)
+
+
+  // console.log("context",  useContext(SocketContext))
+  // console.log("stream", stream)
+  // console.log("my video", myVideo?.current?.srcObject )
+  // console.log("user video", userVideo?.current?.srcObject)
+
+
+  // console.log({ queryDetails });
   const { loading, query, error } = queryDetails;
 
   useEffect(() => {}, [dispatch, queryId]);
@@ -28,6 +40,11 @@ function QueryDetailsPage() {
       <Options>
         <Notifications />
       </Options>
+
+      <div className='d-flex' >
+        <Sidebar id={userInfo?._id} />
+        {selectedConversation && <OpenConversation />}
+      </div>
     </div>
   );
 }

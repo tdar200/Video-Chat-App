@@ -79,7 +79,7 @@ function Options() {
       dispatch(updateTeacherAction(teacher));
     }
 
-    navigate(`/rooms/${call.userId}`);
+    navigate(`/rooms/${userInfo?._id}`);
   }
 
   // console.log("id to call", idToCall);

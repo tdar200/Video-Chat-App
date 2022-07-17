@@ -26,7 +26,7 @@ function TeacherQuery() {
 
   return (
     <Container>
-      <VideoPlayer />
+      {/* <VideoPlayer /> */}
       <Options>
         <Notifications />
         {/* {call.isReceivingCall && !callAccepted && (
@@ -38,10 +38,7 @@ function TeacherQuery() {
         </div>
       )} */}
       </Options>
-      <div className='d-flex' >
-        <Sidebar id={userInfo?._id} />
-        {selectedConversation && <OpenConversation />}
-      </div>
+     
     </Container>
   );
 }
