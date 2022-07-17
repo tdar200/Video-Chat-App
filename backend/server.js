@@ -7,6 +7,7 @@ const notFound = require("./middleware/errorMiddleware");
 const errorHandler = require("./middleware/errorMiddleware");
 const app = express();
 const server = require("http").Server(app);
+const path = require("path");
 // const io = require("socket.io")(server)
 // const { v4: uuidv4 } = require("uuid");
 
