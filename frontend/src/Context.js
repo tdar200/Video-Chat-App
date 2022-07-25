@@ -38,8 +38,10 @@ const ContextProvider = ({ children }) => {
     "conversations",
     []
   );
-  const [selectedConversationIndex, setSelectedConversationIndex] = useState(0);
+  const [selectedConversationIndex, setSelectedConversationIndex] = useState(conversations.length -1);
 
+
+  console.log(contacts, "contacts")
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
@@ -78,7 +80,9 @@ const ContextProvider = ({ children }) => {
     addMessageToConversation({ recipients, text, sender: userInfo?._id });
   }
 
-  console.log("user ID FROM Context", userId)
+  // console.log("user ID FROM Context", userId)
+
+ 
 
   useEffect(() => {
     if (socket == null) return;
@@ -122,12 +126,17 @@ const ContextProvider = ({ children }) => {
     });
 
     socket.on("disconnect", () => {
+      setCallEnded(true);
       const teacher = { id: userInfo?._id, from: null };
 
       dispatch(updateTeacherAction(teacher));
     });
 
     socket.on("receive-message", addMessageToConversation);
+
+    socket.on("callEnded", () => {
+      setCallEnded(true)
+    })
 
     return () => socket.off("receive-message");
   }, [userInfo?._id, socket.id]);
@@ -184,7 +193,7 @@ const ContextProvider = ({ children }) => {
     peer.on("signal", (data) => {
       // setCallAccepted(true);
 
-      console.log(data, "data from context")
+      // console.log(data, "data from context")
       socket.emit("answerCall", {
         signal: data,
         to: call.from,
@@ -275,6 +284,7 @@ const ContextProvider = ({ children }) => {
         name,
         setName,
         callEnded,
+        setCallEnded,
         me,
         callUser,
         leaveCall,
@@ -288,7 +298,8 @@ const ContextProvider = ({ children }) => {
         selectedConversation: formattedConversations[selectedConversationIndex],
         contacts,
         createContact,
-        setUserId
+        setUserId,
+        userId
       }}>
       {children}
     </SocketContext.Provider>

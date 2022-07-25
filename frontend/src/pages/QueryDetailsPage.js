@@ -1,47 +1,57 @@
-import React, { useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 // import { queryDetail } from '../reducers/queryReducers'
 import VideoPlayer from "../component/VideoPlayer";
 import { getQueryDetails } from "../actions/queryActions";
 import { Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
 import { SocketContext } from "../Context";
 import Sidebar from "../component/Sidebar";
 import OpenConversation from "../component/OpenConversation";
+import { getTeacherDetails } from "../actions/teacherActions";
+import Timer from "../component/Timer";
 
 function QueryDetailsPage() {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  let params = useParams();
-  let queryId = params.id;
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const params = useParams();
 
-  const queryDetails = useSelector((state) => state);
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const {selectedConversation, myVideo, stream, userVideo} = useContext(SocketContext)
+  const {
+    selectedConversation,
+    myVideo,
+    stream,
+    userVideo,
+    callEnded,
+    leaveCall,
+    callAccepted,
+    call
+  } = useContext(SocketContext);
+
+  console.log("call Accepted", callAccepted)
+  console.log("call", call)
+
+  // console.log(callEnded)
 
 
-  // console.log("context",  useContext(SocketContext))
-  // console.log("stream", stream)
-  // console.log("my video", myVideo?.current?.srcObject )
-  // console.log("user video", userVideo?.current?.srcObject)
 
-
-  // console.log({ queryDetails });
-  const { loading, query, error } = queryDetails;
-
-  useEffect(() => {}, [dispatch, queryId]);
+  // useEffect(() => {
+  //   if (callEnded) {
+  //     navigate("/");
+  //   }
+  // }, [callEnded, leaveCall, navigate]);
 
   return (
     <div>
+      <Timer />
       <VideoPlayer />
-
       <Options>
         <Notifications />
       </Options>
-
-      <div className='d-flex' >
+      <div className='d-flex'>
         <Sidebar id={userInfo?._id} />
         {selectedConversation && <OpenConversation />}
       </div>

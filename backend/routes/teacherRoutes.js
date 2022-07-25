@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 const Teacher = require("../models/teacherModel");
 const User = require("../models/userModel");
 const protect = require("../middleware/authMiddleware");
+const Student = require("../models/studentModel");
 
 router.route("/detail/:id").get(
   protect,
@@ -29,7 +30,6 @@ router.route("/detail/:id").get(
 router.route("/update/:id/:userId").put(
   protect,
   asyncHandler(async (req, res) => {
-
     const teacher = await Teacher.findOne({
       user: req.params.id,
     });
@@ -121,6 +121,24 @@ router.route("/:category").get(
     } else {
       res.status(404);
       throw new Error("No teachers found");
+    }
+  })
+);
+
+router.route("/:id/credit").put(
+  protect,
+  asyncHandler(async (req, res) => {
+    const { credit } = req.body;
+
+    const teacher = await Teacher.find({ user: req.params.id });
+
+    if (teacher) {
+      teacher[0].credit = teacher[0].credit + credit;
+      const updatedTeacher = await teacher[0].save();
+      res.json(updatedTeacher);
+    } else {
+      res.status(404);
+      throw new Error("Teacher not found");
     }
   })
 );

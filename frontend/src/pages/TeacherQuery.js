@@ -21,7 +21,7 @@ function TeacherQuery() {
     callEnded,
     answerCall,
     call,
-    selectedConversation,
+  
   } = useContext(SocketContext);
 
   return (

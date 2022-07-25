@@ -8,7 +8,7 @@ function Conversations() {
 
   return (
     <ListGroup variant="flush">
-    {conversations.map((conversation, index) => (
+    {/* {conversations.map((conversation, index) => (
       <ListGroup.Item
         key={index}
         action
@@ -17,7 +17,7 @@ function Conversations() {
       >
         {conversation.recipients.map(r => r.name).join(', ')}
       </ListGroup.Item>
-    ))}
+    ))} */}
   </ListGroup>
   )
 }

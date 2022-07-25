@@ -19,7 +19,8 @@ import {
 import {
   teacherListReducer,
   teacherUpdateReducer,
-  teacherDetailsReducer
+  teacherDetailsReducer,
+  teacherUpdateCreditReducer
 } from "./reducers/teacherReducer"
 
 import {
@@ -44,6 +45,7 @@ const reducer = combineReducers({
   teacherList: teacherListReducer,
   teacherUpdate: teacherUpdateReducer,
   teacherDetail: teacherDetailsReducer,
+  teacherUpdateCredit: teacherUpdateCreditReducer,
   studentDetail: studentDetailReducer,
   studentUpdate: studentUpdateReducer,
   roomCreate: roomCreateReducer,

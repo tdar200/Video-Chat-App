@@ -24,6 +24,7 @@ import Notifications from "../component/Notifications";
 import VideoPlayer from "../component/VideoPlayer";
 import OpenConversation from "../component/OpenConversation";
 import QueryDetailsPage from "./QueryDetailsPage";
+
 function CreateQuery() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -45,7 +46,10 @@ function CreateQuery() {
     callAcceptedOtherEnd,
     selectedConversation,
     myVideo,
-    setUserId
+    setUserId,
+    setCallEnded,
+    createContact,
+    createConversation,
   } = useContext(SocketContext);
 
   // console.log(useContext(SocketContext), "context front");
@@ -118,22 +122,21 @@ function CreateQuery() {
 
   // console.log("teacher detail", teacherDetail);
 
-  const handleClick = (id) => {
-    // console.log("call accepted", teacher);
-    setUserId(id)
+  const handleClick = (id, name) => {
+    setUserId(id);
     callUser(id);
-
-    // console.log("teacher", teacher);
-    // navigate(`/rooms/${id}`);
-
+    createContact(id, name);
+    createConversation([id]);
     setIdToCall(id);
   };
 
   useEffect(() => {
-    if (!teacher?.call_connected) return;
-
-    navigate(`/rooms/${idToCall}`);
-  }, [idToCall, navigate, teacher?.call_connected]);
+    if ( !callAccepted) {
+      return;
+    } else {
+      navigate(`/rooms/${idToCall}`);
+    }
+  }, [callAccepted, idToCall, navigate, setCallEnded, teacher?.call_connected]);
 
   const addCredit = () => {
     const student = {
@@ -142,11 +145,12 @@ function CreateQuery() {
     };
 
     dispatch(studentUpdate(student));
+
     window.location.reload();
   };
 
-  console.log("teacher outside", teacherDetail);
-  console.log(idToCall, "id to call");
+  // console.log("teacher outside", teacherDetail);
+  // console.log(idToCall, "id to call");
 
   return (
     <>
@@ -185,7 +189,9 @@ function CreateQuery() {
                           <td>{item?.hourly_rate}</td>
                           <td>
                             <Button
-                              onClick={() => handleClick(item?.user?._id)}
+                              onClick={() =>
+                                handleClick(item?.user?._id, item?.user?.name)
+                              }
                               variant='success'>
                               Connect
                             </Button>

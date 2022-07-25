@@ -65,8 +65,12 @@ const teacherSchema = mongoose.Schema({
   call_connected: {
     type: String,
   },
+
+  credit: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const Teacher = mongoose.model("Teacher", teacherSchema);
-
 module.exports = Teacher;

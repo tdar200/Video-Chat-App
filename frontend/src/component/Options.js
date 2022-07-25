@@ -58,15 +58,15 @@ function Options() {
     answerCall,
     call,
     userIdState,
+    setCallEnded,
+    createContact,
+    createConversation
   } = useContext(SocketContext);
 
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const dispatch = useDispatch();
-
-  // console.log("context ", useContext(SocketContext));
-
   const [idToCall, setIdToCall] = useState("");
   const classes = useStyles();
 
@@ -76,13 +76,13 @@ function Options() {
     if (call.isReceivingCall && call.from) {
       const teacher = { id: userInfo?._id, from: call.from };
 
+      createContact(call.from, "student");
+      createConversation([call.from])
       dispatch(updateTeacherAction(teacher));
     }
 
     navigate(`/rooms/${userInfo?._id}`);
   }
-
-  // console.log("id to call", idToCall);
 
   return (
     <Container className={classes.container}>

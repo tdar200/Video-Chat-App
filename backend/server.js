@@ -63,21 +63,21 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 
 const users = {
-  //[key: userID]: {socketID: string}
+
 };
 
 io.on("connection", async (socket) => {
   // console.log(socket, "socket backend")
 
+  // var clients = io.sockets
+
+  // console.log(clients)
+
   const id = socket.handshake.query.id;
   socket.join(id);
 
-  // console.log("id backned", id);
 
-  socket.on("logged", ({ userId, socketId }) => {
-    // console.log("connection", socketId, userId);
-    users[userId] = socketId;
-  });
+
 
   // console.log("users", users)
 
@@ -86,35 +86,18 @@ io.on("connection", async (socket) => {
     socket.emit("user", {
       userId: userId,
       socketId: users[userId],
-      // sockets: JSON.stringify(socket),
     });
 
     // socket.emit("me", socket.handshake.query.id);
   });
 
-  // console.log(users,"users")
-
-  // socket.on("me", () => {
-  //   socket.broadcast.emit("me", userId);
-  // });
-
-  // const sockets = Array.from(io.sockets.sockets).map((socket) => socket[0]);
-
-  // console.log(sockets);
 
   socket.on("disconnect", () => {
     socket.broadcast.emit("callEnded");
   });
-  // console.log("socket io bakend trigger")
-  // console.log(io.eio.clients)
 
   socket.on("callUser", ({ userToCall, signalData, from }) => {
-    // console.log("backend user to call", userToCall);
-    // console.log("backend from ", from)
 
-    // console.log("call user", users[from])
-
-    // console.log("backend data", { userToCall, signalData, from });
     io.to(userToCall).emit("callUser", {
       signal: signalData,
       from: from,
