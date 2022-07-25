@@ -154,8 +154,8 @@ function Options() {
 
         {call.isReceivingCall && !callAccepted && (
           <div style={{ display: "flex", justifyContent: "space-around" }}>
-            <h1>{student[0]?.user.name} is trying to connect:</h1>
-            <h1>gender: {student[0]?.user.name} </h1>
+            <h1>{student[0]?.user?.name} is trying to connect:</h1>
+            {/* <h1>gender: {student[0]?.user.name} </h1> */}
             <Button variant='contained' color='primary' onClick={handleClick}>
               Connect
             </Button>
