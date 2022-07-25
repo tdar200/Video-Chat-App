@@ -40,8 +40,6 @@ const ContextProvider = ({ children }) => {
   );
   const [selectedConversationIndex, setSelectedConversationIndex] = useState(conversations.length -1);
 
-
-  console.log(contacts, "contacts")
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();

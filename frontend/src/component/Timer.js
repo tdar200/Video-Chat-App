@@ -52,8 +52,6 @@ function Timer() {
 
   useEffect(() => {
     if (callEnded) {
-      console.log("call Ended", callEnded);
-      console.log("call end function");
 
       let convertedHours = hours * 60;
       let convertedSeconds = seconds / 60;
