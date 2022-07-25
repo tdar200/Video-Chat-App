@@ -25,7 +25,8 @@ import {
 
 import {
   studentDetailReducer,
-  studentUpdateReducer
+  studentUpdateReducer,
+  studentDetailUserPopulateReducer
 } from "./reducers/studentReducers"
 
 import {
@@ -34,8 +35,6 @@ import {
 } from "./reducers/roomReducers"
 
 import { callAcceptedReducer } from "./reducers/callReducers";
-
-
 
 const reducer = combineReducers({
   queryList: queryListReducer,
@@ -47,6 +46,7 @@ const reducer = combineReducers({
   teacherDetail: teacherDetailsReducer,
   teacherUpdateCredit: teacherUpdateCreditReducer,
   studentDetail: studentDetailReducer,
+  studentDetailUserPopulate: studentDetailUserPopulateReducer, 
   studentUpdate: studentUpdateReducer,
   roomCreate: roomCreateReducer,
   roomDetail: roomDetailReducer,

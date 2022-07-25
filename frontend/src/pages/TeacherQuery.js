@@ -8,10 +8,14 @@ import VideoPlayer from "../component/VideoPlayer";
 import Sidebar from "../component/Sidebar";
 import OpenConversation from "../component/OpenConversation";
 
+
 function TeacherQuery() {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const [reloadOnce, setReloadOnce] = useState(false);
+
+
+
+  
 
   const {
     me,
@@ -45,7 +49,7 @@ function TeacherQuery() {
 
   return (
     <Container>
-      {/* <VideoPlayer /> */}
+      
       <Options>
         <Notifications />
       </Options>

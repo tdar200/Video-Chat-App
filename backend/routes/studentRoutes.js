@@ -9,6 +9,25 @@ router.route("/:id").get(
   asyncHandler(async (req, res) => {
     const student = await Student.find({ user: req.params.id });
     if (student) {
+      // console.log("is this being run", student)
+      res.json(student);
+    } else {
+      res.status(404);
+      throw new Error("Student not found");
+    }
+  })
+);
+
+router.route("/populateUser/:id").get(
+  protect,
+  asyncHandler(async (req, res) => {
+    const student = await Student.find({ user: req.params.id }).populate({
+      path: "user",
+    });
+    if (student) {
+
+      console.log("is student route being hit", student)
+
       res.json(student);
     } else {
       res.status(404);

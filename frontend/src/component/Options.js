@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Button,
   TextField,
@@ -14,6 +14,7 @@ import { Assignment, Phone, PhoneDisabled } from "@material-ui/icons";
 import { SocketContext } from "../Context";
 import { updateTeacherAction } from "../actions/teacherActions";
 import { useDispatch, useSelector } from "react-redux";
+import { studentDetailUserPopulateAction } from "../actions/studentActions";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -60,15 +61,32 @@ function Options() {
     userIdState,
     setCallEnded,
     createContact,
-    createConversation
+    createConversation,
   } = useContext(SocketContext);
 
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const dispatch = useDispatch();
+
+  const studentDetailUserPopulate = useSelector((state) => state.studentDetailUserPopulate);
+  const { loading, student, success } = studentDetailUserPopulate;
+
   const [idToCall, setIdToCall] = useState("");
   const classes = useStyles();
+
+  console.log("student detail user populate", studentDetailUserPopulate)
+  console.log("call", call.from)
+
+  useEffect(() => {
+    if (call?.from && !success &&  loading) {
+      console.log("is this function being run")
+      dispatch(studentDetailUserPopulateAction(call?.from));
+    }
+  }, [call?.from, dispatch, loading, student, success]);
+
+ 
+
 
   function handleClick() {
     answerCall();
@@ -77,7 +95,7 @@ function Options() {
       const teacher = { id: userInfo?._id, from: call.from };
 
       createContact(call.from, "student");
-      createConversation([call.from])
+      createConversation([call.from]);
       dispatch(updateTeacherAction(teacher));
     }
 
@@ -136,7 +154,8 @@ function Options() {
 
         {call.isReceivingCall && !callAccepted && (
           <div style={{ display: "flex", justifyContent: "space-around" }}>
-            <h1>{call.name} is trying to connect:</h1>
+            <h1>{student[0]?.user.name} is trying to connect:</h1>
+            <h1>gender: {student[0]?.user.name} </h1>
             <Button variant='contained' color='primary' onClick={handleClick}>
               Connect
             </Button>

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { studentDetailAction } from "./actions/studentActions";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logout } from "./actions/userActions";
-import { getTeacherDetails } from "./actions/teacherActions";
+
 
 function Navigation() {
   const dispatch = useDispatch();

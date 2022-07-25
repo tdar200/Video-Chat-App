@@ -17,7 +17,7 @@ const SocketContext = createContext();
 const ContextProvider = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const socket = io("http://localhost:5000", {
+  const socket = io("https://new-video-chat-app.herokuapp.com/", {
     query: { id: userInfo?._id },
   });
 
@@ -185,7 +185,8 @@ const ContextProvider = ({ children }) => {
     // console.log("callWas accccpected");
     setCallAccepted(true);
     dispatch(callAcceptedAction);
-    setUserId(call.from)
+    // setUserId(call.from)
+    
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on("signal", (data) => {
