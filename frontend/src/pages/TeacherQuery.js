@@ -32,16 +32,16 @@ function TeacherQuery() {
   //   }
   // }, [reloadOnce]);
 
-  const reloadCount = sessionStorage.getItem("reloadCount");
+  // const reloadCount = sessionStorage.getItem("reloadCount");
 
-  useEffect(() => {
-    if (reloadCount < 2) {
-      sessionStorage.setItem("reloadCount", String(reloadCount + 1));
-      window.location.reload();
-    } else {
-      sessionStorage.removeItem("reloadCount");
-    }
-  }, [reloadCount]);
+  // useEffect(() => {
+  //   if (reloadCount < 2) {
+  //     sessionStorage.setItem("reloadCount", String(reloadCount + 1));
+  //     window.location.reload();
+  //   } else {
+  //     sessionStorage.removeItem("reloadCount");
+  //   }
+  // }, [reloadCount]);
 
   return (
     <Container>
