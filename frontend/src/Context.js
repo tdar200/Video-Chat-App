@@ -17,7 +17,7 @@ const SocketContext = createContext();
 const ContextProvider = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const socket = io("http://localhost:5000", {
+  const socket = io("https://new-video-chat-app.herokuapp.com/", {
     query: { id: userInfo?._id },
   });
 
