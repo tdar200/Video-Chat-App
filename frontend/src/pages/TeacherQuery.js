@@ -25,12 +25,12 @@ function TeacherQuery() {
     call,
   } = useContext(SocketContext);
 
-  useEffect(() => {
-    if (!reloadOnce) {
-      setReloadOnce(true);
-      window.location.reload();
-    }
-  }, [reloadOnce]);
+  // useEffect(() => {
+  //   if (!reloadOnce) {
+  //     setReloadOnce(true);
+  //     window.location.reload();
+  //   }
+  // }, [reloadOnce]);
 
   return (
     <Container>
