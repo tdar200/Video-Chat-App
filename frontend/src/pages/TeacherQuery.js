@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../Context";
 import { Button, Container } from "@material-ui/core";
 import { Assignment, Phone, PhoneDisabled } from "@material-ui/icons";
@@ -11,6 +11,8 @@ import OpenConversation from "../component/OpenConversation";
 function TeacherQuery() {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  const [reloadOnce, setReloadOnce] = useState(false);
+
   const {
     me,
     callAccepted,
@@ -21,8 +23,14 @@ function TeacherQuery() {
     callEnded,
     answerCall,
     call,
-  
   } = useContext(SocketContext);
+
+  useEffect(() => {
+    if (!reloadOnce) {
+      setReloadOnce(true);
+      window.location.reload();
+    }
+  }, [reloadOnce]);
 
   return (
     <Container>
@@ -38,7 +46,6 @@ function TeacherQuery() {
         </div>
       )} */}
       </Options>
-     
     </Container>
   );
 }
