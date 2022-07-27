@@ -61,7 +61,7 @@ function CreateQuery() {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  console.log(userInfo)
+  console.log(userInfo);
 
   const queryList = useSelector((state) => state.queryList);
   const { loading, queries, success: queriesSuccess } = queryList;
@@ -130,15 +130,7 @@ function CreateQuery() {
     setIdToCall(id);
   };
 
-  const handleDateTimePicker = (id) => {
-
-
-
-
-
-  }
-
-  
+  const handleDateTimePicker = (id) => {};
 
   useEffect(() => {
     if (!callAccepted) {
@@ -165,8 +157,8 @@ function CreateQuery() {
         {queries?.length > 0 && teachers?.length > 0 ? (
           <div>
             <h1>Question : {queries[0].query}</h1>
-            <div className='d-flex justify-content-between'>
-              <Button variant='danger' onClick={handleDelete}>
+            <div className="d-flex justify-content-between">
+              <Button variant="danger" onClick={handleDelete}>
                 {" "}
                 Delete{" "}
               </Button>
@@ -200,16 +192,16 @@ function CreateQuery() {
                               onClick={() =>
                                 handleClick(item?.user?._id, item?.user?.name)
                               }
-                              variant='success'>
+                              variant="success"
+                            >
                               Connect
                             </Button>
                           </td>
                           <td>
                             <Button
-                              onClick={() =>
-                                setDateTimeModal(true)
-                              }
-                              variant='success'>
+                              onClick={() => setDateTimeModal(true)}
+                              variant="success"
+                            >
                               Schedule an Appointment
                             </Button>
                           </td>
@@ -222,8 +214,8 @@ function CreateQuery() {
           </div>
         ) : null}
 
-        <div className='d-flex justify-content-between'>
-          <Button onClick={() => setShowModal(true)} variant='secondary'>
+        <div className="d-flex justify-content-between">
+          <Button onClick={() => setShowModal(true)} variant="secondary">
             Add Question
           </Button>
           <Button onClick={addCredit}>Add Credit</Button>

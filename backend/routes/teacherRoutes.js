@@ -13,8 +13,7 @@ router.route("/makeAppointment/:id").put(
 
     const teacher = await Teacher.find({ user: req.params.id });
 
- 
-
+    console.log("req,")
     if (teacher) {
       const newAppointment = {
        user: req.user._id,
@@ -22,8 +21,8 @@ router.route("/makeAppointment/:id").put(
        time: time,
       };
 
-     const updatedAppointment = await Teacher.updateOne(
-        { _id: req.params.id },
+     const updatedAppointment = await Teacher.findOneAndUpdate(
+        { user: req.params.id },
         { $push: { appointments: newAppointment } },
         { useFindAndModify: false }
 
