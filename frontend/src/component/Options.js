@@ -75,7 +75,7 @@ function Options() {
   const [idToCall, setIdToCall] = useState("");
   const classes = useStyles();
 
-  console.log("student detail user populate", studentDetailUserPopulate)
+  // console.log("student detail user populate", studentDetailUserPopulate)
   console.log("call", call.from)
 
   useEffect(() => {

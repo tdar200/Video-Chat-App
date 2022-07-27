@@ -24,6 +24,7 @@ import Notifications from "../component/Notifications";
 import VideoPlayer from "../component/VideoPlayer";
 import OpenConversation from "../component/OpenConversation";
 import QueryDetailsPage from "./QueryDetailsPage";
+import DateTimeModal from "../component/DateTimeModal";
 
 function CreateQuery() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ function CreateQuery() {
   const { loading: teacherLoading, teacher } = teacherDetail;
 
   const [showModal, setShowModal] = useState(false);
+  const [dateTimeModal, setDateTimeModal] = useState(false);
 
   useEffect(() => {
     if (queries?.length === 0 && !loading && !queriesSuccess) {
@@ -118,10 +120,6 @@ function CreateQuery() {
     window.location.reload();
   };
 
-  // console.log("call accepted", callAccepted);
-
-  // console.log("teacher detail", teacherDetail);
-
   const handleClick = (id, name) => {
     setUserId(id);
     callUser(id);
@@ -131,7 +129,7 @@ function CreateQuery() {
   };
 
   useEffect(() => {
-    if ( !callAccepted) {
+    if (!callAccepted) {
       return;
     } else {
       navigate(`/rooms/${idToCall}`);
@@ -148,9 +146,6 @@ function CreateQuery() {
 
     window.location.reload();
   };
-
-  // console.log("teacher outside", teacherDetail);
-  // console.log(idToCall, "id to call");
 
   return (
     <>
@@ -211,6 +206,12 @@ function CreateQuery() {
           </Button>
           <Button onClick={addCredit}>Add Credit</Button>
         </div>
+
+        <DateTimeModal
+          setshowmodal={setDateTimeModal}
+          show={dateTimeModal}
+          onHide={() => setDateTimeModal(false)}
+        />
 
         <ModalComponent
           setshowmodal={setShowModal}
