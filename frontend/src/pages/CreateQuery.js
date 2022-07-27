@@ -53,15 +53,10 @@ function CreateQuery() {
     createConversation,
   } = useContext(SocketContext);
 
-  // console.log(useContext(SocketContext), "context front");
-
-  // console.log("userIdState", userIdState);
 
   const [idToCall, setIdToCall] = useState("");
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-  console.log(userInfo);
 
   const queryList = useSelector((state) => state.queryList);
   const { loading, queries, success: queriesSuccess } = queryList;
@@ -77,6 +72,7 @@ function CreateQuery() {
 
   const [showModal, setShowModal] = useState(false);
   const [dateTimeModal, setDateTimeModal] = useState(false);
+  const [scheduleAppointmentId, setScheduleAppointmentId] = useState(null)
 
   useEffect(() => {
     if (queries?.length === 0 && !loading && !queriesSuccess) {
@@ -109,14 +105,6 @@ function CreateQuery() {
     }
   }, [idToCall, callAccepted, navigate]);
 
-  // useEffect(() => {
-  //   if (performance.getEntriesByType("navigation")[0].type === "reload") {
-  //     console.log("This page is reloaded");
-  //   } else {
-  //     console.log("This page is not reloaded");
-  //   }
-  // }, []);
-
   const handleDelete = () => {
     dispatch(deleteQuery(queries[0]._id));
     window.location.reload();
@@ -130,7 +118,12 @@ function CreateQuery() {
     setIdToCall(id);
   };
 
-  const handleDateTimePicker = (id) => {};
+  const handleClickDatePickerModal = (id) => {
+    setDateTimeModal(true)
+    setScheduleAppointmentId(id)
+  }
+
+
 
   useEffect(() => {
     if (!callAccepted) {
@@ -171,7 +164,6 @@ function CreateQuery() {
                   <th>Gender</th>
                   <th>Email</th>
                   <th>Hourly Rate</th>
-
                   <th></th>
                   <th></th>
                 </tr>
@@ -199,7 +191,7 @@ function CreateQuery() {
                           </td>
                           <td>
                             <Button
-                              onClick={() => setDateTimeModal(true)}
+                              onClick={() => handleClickDatePickerModal(item.user._id)}
                               variant="success"
                             >
                               Schedule an Appointment
@@ -225,6 +217,7 @@ function CreateQuery() {
           setshowmodal={setDateTimeModal}
           show={dateTimeModal}
           onHide={() => setDateTimeModal(false)}
+          scheduleAppointmentId={scheduleAppointmentId}
         />
 
         <ModalComponent
@@ -233,11 +226,6 @@ function CreateQuery() {
           onHide={() => setShowModal(false)}
         />
       </Container>
-
-      {/* <div className='d-flex'>
-        <Sidebar id={userInfo?._id} />
-        {selectedConversation && <OpenConversation />}
-      </div> */}
     </>
   );
 }

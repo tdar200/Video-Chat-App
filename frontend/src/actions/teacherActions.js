@@ -11,7 +11,10 @@ import {
   TEACHER_DETAIL_REQUEST,
   TEACHER_UPDATE_CREDIT_REQUEST,
   TEACHER_UPDATE_CREDIT_SUCCESS,
-  TEACHER_UPDATE_CREDIT_FAIL
+  TEACHER_UPDATE_CREDIT_FAIL,
+  TEACHER_ADD_APPOINTMENT_REQUEST,
+  TEACHER_ADD_APPOINTMENT_SUCCESS,
+  TEACHER_ADD_APPOINTMENT_FAIL
 } from "../constants/teacherConstants";
 
 export const listTeachers = (category) => async (dispatch, getState) => {
@@ -158,6 +161,44 @@ export const updateTeacherCreditAction = (teacher) => async(dispatch, getState) 
       payload: message,
     });
   }
+}
 
+export const teacherAddAppointmentAction = (teacher) => async(dispatch, getState) => {
+  try {
+    dispatch({
+      type: TEACHER_ADD_APPOINTMENT_REQUEST,
+    });
 
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.put(
+      `/api/teachers/addAppointment/${teacher.id}`,
+      teacher,
+      config
+    );
+
+    dispatch({
+      type: TEACHER_ADD_APPOINTMENT_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    const message =
+      error.response && error.response.data.message
+        ? error.response.data.message
+        : error.message;
+
+    dispatch({
+      type: TEACHER_ADD_APPOINTMENT_FAIL,
+      payload: message,
+    });
+  }
 }

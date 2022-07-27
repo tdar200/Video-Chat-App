@@ -31,9 +31,6 @@ function QueryDetailsPage() {
     call
   } = useContext(SocketContext);
 
-  console.log("call Accepted", callAccepted)
-  console.log("call", call)
-
   // console.log(callEnded)
 
 

@@ -9,31 +9,43 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 function DateTimeModal(props) {
   const [dateValue, setDateValue] = useState(moment());
 
-  console.log(dateValue)
+  const { scheduleAppointmentId} = props;
 
-  function handleSubmit(e) {
+  const handleDateTimePicker = (e) => {
+
     e.preventDefault();
+    console.log(dateValue, "date Value")
+
+    const teacher = {
+      id :scheduleAppointmentId,
+      date: "",
+      time: ""
+      
+    }
 
 
-  }
+  };
+
+  
 
   return (
     <Modal
       show={props.show}
       onHide={props.onHide}
-      size='lg'
-      aria-labelledby='contained-modal-title-vcenter'
-      centered>
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
       <Modal.Header closeButton>
-        <Modal.Title id='contained-modal-title-vcenter'>
+        <Modal.Title id="contained-modal-title-vcenter">
           Schedule an Appointment
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleDateTimePicker }>
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <DateTimePicker
-              label='Pick Date and Time'
+              label="Pick Date and Time"
               renderInput={(params) => <TextField {...params} />}
               value={dateValue}
               onChange={(newValue) => {
@@ -42,7 +54,7 @@ function DateTimeModal(props) {
             />
           </LocalizationProvider>
 
-          <Button type='submit' className='float-end'>
+          <Button type="submit" className="float-end">
             Submit
           </Button>
         </Form>

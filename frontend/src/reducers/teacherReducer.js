@@ -10,7 +10,10 @@ import {
   TEACHER_DETAIL_REQUEST,
   TEACHER_UPDATE_CREDIT_REQUEST,
   TEACHER_UPDATE_CREDIT_SUCCESS,
-  TEACHER_UPDATE_CREDIT_FAIL
+  TEACHER_UPDATE_CREDIT_FAIL,
+  TEACHER_ADD_APPOINTMENT_REQUEST,
+  TEACHER_ADD_APPOINTMENT_SUCCESS,
+  TEACHER_ADD_APPOINTMENT_FAIL
 } from "../constants/teacherConstants";
 
 export const teacherListReducer = (state = { teachers: [] }, action) => {
@@ -98,6 +101,30 @@ export const teacherUpdateCreditReducer = (
         teacher: action.payload,
       };
     case TEACHER_UPDATE_CREDIT_FAIL:
+      return {
+        loading: false,
+        error: action.payload,
+      };
+    default:
+      return state;
+  }
+}
+
+export const teacherAddAppointmentReducer = (
+  state = { loading: true },
+  action
+) => {
+  switch (action.type) {
+    case TEACHER_ADD_APPOINTMENT_REQUEST:
+      return {
+        loading: true,
+      };
+    case TEACHER_ADD_APPOINTMENT_SUCCESS:
+      return {
+        loading: false,
+        teacher: action.payload,
+      };
+    case TEACHER_ADD_APPOINTMENT_FAIL:
       return {
         loading: false,
         error: action.payload,

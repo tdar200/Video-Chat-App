@@ -13,7 +13,6 @@ router.route("/makeAppointment/:id").put(
 
     const teacher = await Teacher.find({ user: req.params.id });
 
-    console.log("req,")
     if (teacher) {
       const newAppointment = {
        user: req.user._id,
@@ -25,10 +24,7 @@ router.route("/makeAppointment/:id").put(
         { user: req.params.id },
         { $push: { appointments: newAppointment } },
         { useFindAndModify: false }
-
       );
-      console.log(teacher);
-      console.log("new appointment", newAppointment)
 
       res.json(updatedAppointment);
     } else {
@@ -41,14 +37,10 @@ router.route("/makeAppointment/:id").put(
 router.route("/detail/:id").get(
   protect,
   asyncHandler(async (req, res) => {
-    // console.log(req.params);
 
     const teacher = await Teacher.findOne({
       user: req.params.id,
     });
-
-    // console.log("teacher id ", req.params.id)
-    // console.log("teacher",teacher)
 
     if (teacher) {
       res.json(teacher);
@@ -70,8 +62,6 @@ router.route("/update/:id/:userId").put(
       call_connected: req.params.id,
     });
 
-    console.log("student obj", student);
-
     if (teacher && req.params.userId !== "null") {
       teacher.call_connected = req.params.userId;
 
@@ -89,7 +79,6 @@ router.route("/update/:id/:userId").put(
 
       res.json(updatedTeacher);
     } else if (teacher && req.params.userId === "null") {
-      console.log("does this function even run");
       await Teacher.findOneAndUpdate(
         {
           _id: teacher._id,
@@ -102,7 +91,6 @@ router.route("/update/:id/:userId").put(
 
       res.status(200);
 
-      // console.log(teacher, "teacher");
     } else if (student && req.params.userId === "null") {
       await Teacher.findOneAndUpdate(
         {
