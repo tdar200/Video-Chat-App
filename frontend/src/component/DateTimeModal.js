@@ -4,12 +4,12 @@ import moment from "moment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { TextField } from "@mui/material";
-import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 function DateTimeModal(props) {
   const [dateValue, setDateValue] = useState(moment());
 
-  const { scheduleAppointmentId} = props;
 
   const handleDateTimePicker = (e) => {
 
@@ -17,13 +17,11 @@ function DateTimeModal(props) {
     console.log(dateValue, "date Value")
 
     const teacher = {
-      id :scheduleAppointmentId,
+      id :props.scheduleAppointmentId,
       date: "",
       time: ""
       
     }
-
-
   };
 
   
@@ -43,7 +41,7 @@ function DateTimeModal(props) {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleDateTimePicker }>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
               label="Pick Date and Time"
               renderInput={(params) => <TextField {...params} />}

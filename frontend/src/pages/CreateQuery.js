@@ -105,6 +105,15 @@ function CreateQuery() {
     }
   }, [idToCall, callAccepted, navigate]);
 
+  useEffect(() => {
+    if (!callAccepted) {
+      return;
+    } else {
+      navigate(`/rooms/${idToCall}`);
+    }
+  }, [callAccepted, idToCall, navigate, setCallEnded, teacher?.call_connected]);
+
+
   const handleDelete = () => {
     dispatch(deleteQuery(queries[0]._id));
     window.location.reload();
@@ -122,16 +131,6 @@ function CreateQuery() {
     setDateTimeModal(true)
     setScheduleAppointmentId(id)
   }
-
-
-
-  useEffect(() => {
-    if (!callAccepted) {
-      return;
-    } else {
-      navigate(`/rooms/${idToCall}`);
-    }
-  }, [callAccepted, idToCall, navigate, setCallEnded, teacher?.call_connected]);
 
   const addCredit = () => {
     const student = {
@@ -191,7 +190,7 @@ function CreateQuery() {
                           </td>
                           <td>
                             <Button
-                              onClick={() => handleClickDatePickerModal(item.user._id)}
+                              onClick={() => handleClickDatePickerModal(item?.user?._id)}
                               variant="success"
                             >
                               Schedule an Appointment
