@@ -6,6 +6,39 @@ const User = require("../models/userModel");
 const protect = require("../middleware/authMiddleware");
 const Student = require("../models/studentModel");
 
+router.route("/makeAppointment/:id").put(
+  protect,
+  asyncHandler(async (req, res) => {
+    const { user, date, time } = req.body;
+
+    const teacher = await Teacher.find({ user: req.params.id });
+
+ 
+
+    if (teacher) {
+      const newAppointment = {
+       user: req.user._id,
+       date: new Date(date),
+       time: time,
+      };
+
+     const updatedAppointment = await Teacher.updateOne(
+        { _id: req.params.id },
+        { $push: { appointments: newAppointment } },
+        { useFindAndModify: false }
+
+      );
+      console.log(teacher);
+      console.log("new appointment", newAppointment)
+
+      res.json(updatedAppointment);
+    } else {
+      res.status(404);
+      throw new Error("Teacher not found");
+    }
+  })
+);
+
 router.route("/detail/:id").get(
   protect,
   asyncHandler(async (req, res) => {

@@ -12,11 +12,6 @@ import OpenConversation from "../component/OpenConversation";
 function TeacherQuery() {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-
-
-
-  
-
   const {
     me,
     callAccepted,

@@ -61,6 +61,8 @@ function CreateQuery() {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  console.log(userInfo)
+
   const queryList = useSelector((state) => state.queryList);
   const { loading, queries, success: queriesSuccess } = queryList;
 
@@ -128,6 +130,16 @@ function CreateQuery() {
     setIdToCall(id);
   };
 
+  const handleDateTimePicker = (id) => {
+
+
+
+
+
+  }
+
+  
+
   useEffect(() => {
     if (!callAccepted) {
       return;
@@ -169,6 +181,7 @@ function CreateQuery() {
                   <th>Hourly Rate</th>
 
                   <th></th>
+                  <th></th>
                 </tr>
               </thead>
               {
@@ -189,6 +202,15 @@ function CreateQuery() {
                               }
                               variant='success'>
                               Connect
+                            </Button>
+                          </td>
+                          <td>
+                            <Button
+                              onClick={() =>
+                                setDateTimeModal(true)
+                              }
+                              variant='success'>
+                              Schedule an Appointment
                             </Button>
                           </td>
                         </tr>

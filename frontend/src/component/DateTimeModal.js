@@ -1,10 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Modal, Form, Dropdown } from "react-bootstrap";
-import ScheduleAppointment from "./ScheduleAppointment";
+import moment from "moment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { TextField } from "@mui/material";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 
 function DateTimeModal(props) {
+  const [dateValue, setDateValue] = useState(moment());
+
+  console.log(dateValue)
+
   function handleSubmit(e) {
     e.preventDefault();
+
+
   }
 
   return (
@@ -20,7 +30,22 @@ function DateTimeModal(props) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        {ScheduleAppointment}
+        <Form onSubmit={handleSubmit}>
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DateTimePicker
+              label='Pick Date and Time'
+              renderInput={(params) => <TextField {...params} />}
+              value={dateValue}
+              onChange={(newValue) => {
+                setDateValue(newValue);
+              }}
+            />
+          </LocalizationProvider>
+
+          <Button type='submit' className='float-end'>
+            Submit
+          </Button>
+        </Form>
       </Modal.Body>
     </Modal>
   );

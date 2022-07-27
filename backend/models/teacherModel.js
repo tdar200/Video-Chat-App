@@ -24,6 +24,20 @@ const reviewSchema = mongoose.Schema({
   },
 });
 
+const appointmentSchema = mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
+  },
+  date: {
+    type: Date,
+  },
+  time: {
+    type: String,
+  },
+});
+
 const teacherSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -46,6 +60,7 @@ const teacherSchema = mongoose.Schema({
   },
 
   reviews: [reviewSchema],
+  appointments : [appointmentSchema],
 
   hourly_rate: {
     type: Number,
