@@ -33,9 +33,6 @@ const appointmentSchema = mongoose.Schema({
   date: {
     type: Date,
   },
-  time: {
-    type: String,
-  },
 });
 
 const teacherSchema = mongoose.Schema({

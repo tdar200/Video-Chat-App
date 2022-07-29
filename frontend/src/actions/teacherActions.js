@@ -181,7 +181,7 @@ export const teacherAddAppointmentAction = (teacher) => async(dispatch, getState
     };
 
     const { data } = await axios.put(
-      `/api/teachers/addAppointment/${teacher.id}`,
+      `/api/teachers/make-appointment/${teacher.id}`,
       teacher,
       config
     );

@@ -5,22 +5,40 @@ const Teacher = require("../models/teacherModel");
 const User = require("../models/userModel");
 const protect = require("../middleware/authMiddleware");
 const Student = require("../models/studentModel");
+const moment = require("moment");
 
-router.route("/makeAppointment/:id").put(
+// router.route("/fetch-appointments/:id").get(
+//   protect,
+//   asyncHandler(async (req, res) => {
+//     const teacher = await Teacher.find({ user: req.params.id });
+
+//     if (teacher) {
+
+//     } else {
+//       res.status(404);
+//       throw new Error("Teacher not found");
+//     }
+//   })
+// );
+
+
+
+router.route("/make-appointment/:id").put(
   protect,
   asyncHandler(async (req, res) => {
-    const { user, date, time } = req.body;
+    const { date } = req.body;
 
     const teacher = await Teacher.find({ user: req.params.id });
 
+    console.log("teacher", teacher);
+
     if (teacher) {
       const newAppointment = {
-       user: req.user._id,
-       date: new Date(date),
-       time: time,
+        user: req.user._id,
+        date: moment(date),
       };
 
-     const updatedAppointment = await Teacher.findOneAndUpdate(
+      const updatedAppointment = await Teacher.findOneAndUpdate(
         { user: req.params.id },
         { $push: { appointments: newAppointment } },
         { useFindAndModify: false }
@@ -37,7 +55,6 @@ router.route("/makeAppointment/:id").put(
 router.route("/detail/:id").get(
   protect,
   asyncHandler(async (req, res) => {
-
     const teacher = await Teacher.findOne({
       user: req.params.id,
     });
@@ -90,7 +107,6 @@ router.route("/update/:id/:userId").put(
       );
 
       res.status(200);
-
     } else if (student && req.params.userId === "null") {
       await Teacher.findOneAndUpdate(
         {

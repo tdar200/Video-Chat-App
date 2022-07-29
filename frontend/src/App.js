@@ -10,6 +10,7 @@ import StudentRegisterPage from "./pages/StudentRegisterPage";
 import TeacherRegisterPage from "./pages/TeacherRegisterPage";
 import SignupUser from "./pages/SignupUser";
 import TeacherQuery from "./pages/TeacherQuery";
+import Appointments from "./pages/Appointments";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route
             path='/student-register'
             element={<StudentRegisterPage />}></Route>
+
           <Route
             path='/teacher-register'
             element={<TeacherRegisterPage />}></Route>
@@ -29,6 +31,7 @@ function App() {
           <Route path='/teacher-queries' element={<TeacherQuery />}></Route>
           <Route path='/customer-support' element={<CustomerSupport />}></Route>
           <Route path='/rooms/:id' element={<QueryDetailsPage />}></Route>
+          <Route path='/appointments/:id' element={<Appointments />}></Route>
         </Routes>
       </Router>
     </div>

@@ -4,46 +4,44 @@ import moment from "moment";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { TextField } from "@mui/material";
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { teacherAddAppointmentAction } from "../actions/teacherActions";
+import { useDispatch } from "react-redux";
 
 function DateTimeModal(props) {
+  const dispatch = useDispatch();
   const [dateValue, setDateValue] = useState(moment());
 
-
   const handleDateTimePicker = (e) => {
-
     e.preventDefault();
-    console.log(dateValue, "date Value")
+
+    console.log(props.scheduleAppointmentId, "props id")
 
     const teacher = {
-      id :props.scheduleAppointmentId,
-      date: "",
-      time: ""
-      
-    }
-  };
+      id: props.scheduleAppointmentId,
+      date: dateValue.$d,
+    };
 
-  
+    dispatch(teacherAddAppointmentAction(teacher));
+  };
 
   return (
     <Modal
       show={props.show}
       onHide={props.onHide}
-      size="lg"
-      aria-labelledby="contained-modal-title-vcenter"
-      centered
-    >
+      size='lg'
+      aria-labelledby='contained-modal-title-vcenter'
+      centered>
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
+        <Modal.Title id='contained-modal-title-vcenter'>
           Schedule an Appointment
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form onSubmit={handleDateTimePicker }>
+        <Form onSubmit={handleDateTimePicker}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DateTimePicker
-              label="Pick Date and Time"
+              label='Pick Date and Time'
               renderInput={(params) => <TextField {...params} />}
               value={dateValue}
               onChange={(newValue) => {
@@ -52,7 +50,7 @@ function DateTimeModal(props) {
             />
           </LocalizationProvider>
 
-          <Button type="submit" className="float-end">
+          <Button type='submit' className='float-end'>
             Submit
           </Button>
         </Form>

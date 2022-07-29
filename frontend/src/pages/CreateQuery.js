@@ -17,14 +17,14 @@ import ModalComponent from "../component/ModalComponent";
 import { SocketContext } from "../Context";
 import { getTeacherDetails } from "../actions/teacherActions";
 import Sidebar from "../component/Sidebar";
-
-import data from "../MOCK_DATA.json";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import Options from "../component/Options";
 import Notifications from "../component/Notifications";
 import VideoPlayer from "../component/VideoPlayer";
 import OpenConversation from "../component/OpenConversation";
 import QueryDetailsPage from "./QueryDetailsPage";
 import DateTimeModal from "../component/DateTimeModal";
+import { stringify } from "uuid";
 
 function CreateQuery() {
   const dispatch = useDispatch();
@@ -53,7 +53,6 @@ function CreateQuery() {
     createConversation,
   } = useContext(SocketContext);
 
-
   const [idToCall, setIdToCall] = useState("");
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -72,7 +71,7 @@ function CreateQuery() {
 
   const [showModal, setShowModal] = useState(false);
   const [dateTimeModal, setDateTimeModal] = useState(false);
-  const [scheduleAppointmentId, setScheduleAppointmentId] = useState(null)
+  const [scheduleAppointmentId, setScheduleAppointmentId] = useState(null);
 
   useEffect(() => {
     if (queries?.length === 0 && !loading && !queriesSuccess) {
@@ -113,7 +112,6 @@ function CreateQuery() {
     }
   }, [callAccepted, idToCall, navigate, setCallEnded, teacher?.call_connected]);
 
-
   const handleDelete = () => {
     dispatch(deleteQuery(queries[0]._id));
     window.location.reload();
@@ -128,9 +126,9 @@ function CreateQuery() {
   };
 
   const handleClickDatePickerModal = (id) => {
-    setDateTimeModal(true)
-    setScheduleAppointmentId(id)
-  }
+    setDateTimeModal(true);
+    setScheduleAppointmentId(id);
+  };
 
   const addCredit = () => {
     const student = {
@@ -149,8 +147,8 @@ function CreateQuery() {
         {queries?.length > 0 && teachers?.length > 0 ? (
           <div>
             <h1>Question : {queries[0].query}</h1>
-            <div className="d-flex justify-content-between">
-              <Button variant="danger" onClick={handleDelete}>
+            <div className='d-flex justify-content-between'>
+              <Button variant='danger' onClick={handleDelete}>
                 {" "}
                 Delete{" "}
               </Button>
@@ -183,17 +181,26 @@ function CreateQuery() {
                               onClick={() =>
                                 handleClick(item?.user?._id, item?.user?.name)
                               }
-                              variant="success"
-                            >
+                              variant='success'>
                               Connect
                             </Button>
                           </td>
                           <td>
                             <Button
-                              onClick={() => handleClickDatePickerModal(item?.user?._id)}
-                              variant="success"
-                            >
+                              onClick={() =>
+                                handleClickDatePickerModal(item?.user?._id)
+                              }
+                              variant='success'>
                               Schedule an Appointment
+                            </Button>
+                          </td>
+                          <td>
+                            <Button
+                              onClick={() =>
+                                navigate(`/appointments/${item?.user?._id}`)
+                              }
+                              variant='success'>
+                              List all appointments
                             </Button>
                           </td>
                         </tr>
@@ -205,8 +212,8 @@ function CreateQuery() {
           </div>
         ) : null}
 
-        <div className="d-flex justify-content-between">
-          <Button onClick={() => setShowModal(true)} variant="secondary">
+        <div className='d-flex justify-content-between'>
+          <Button onClick={() => setShowModal(true)} variant='secondary'>
             Add Question
           </Button>
           <Button onClick={addCredit}>Add Credit</Button>

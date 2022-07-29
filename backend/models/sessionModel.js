@@ -15,7 +15,6 @@ const sessionSchema = mongoose.Schema(
 
         session_total_cost: {
             type: Number,
-            required: true,
             default: 0.0
         },
         session_started: {
@@ -25,6 +24,10 @@ const sessionSchema = mongoose.Schema(
         session_ended: {
             type: Date,
             required: true
+        },
+        pictures: {
+            type:String
+
         }
     }
 )
