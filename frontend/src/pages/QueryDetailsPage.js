@@ -25,6 +25,12 @@ function QueryDetailsPage() {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  const sessionCreate = useSelector((state) => state.sessionCreate )
+
+  const {loading, success , session} = sessionCreate
+
+  console.log("sessionCreate", sessionCreate)
+
   const {
     selectedConversation,
     myVideo,
@@ -44,7 +50,7 @@ function QueryDetailsPage() {
     }
   }, [callEnded]);
 
-  console.log(call);
+  // console.log(call);
 
   useEffect(() => {
     if (call) {

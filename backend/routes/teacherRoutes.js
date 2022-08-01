@@ -22,6 +22,25 @@ const moment = require("moment");
 // );
 
 
+router.route("/:id").put(
+  protect,
+  asyncHandler(async (req, res) => {
+    const { rating, sessionId, feedback } = req.body;
+
+    const teacher = await Teacher.find({ user: req.params.id });
+
+    if (teacher) {
+      teacher[0].credit = teacher[0].credit + credit;
+      const updatedTeacher = await teacher[0].save();
+      res.json(updatedTeacher);
+    } else {
+      res.status(404);
+      throw new Error("Teacher not found");
+    }
+  })
+);
+
+
 
 router.route("/make-appointment/:id").put(
   protect,
@@ -178,5 +197,8 @@ router.route("/:id/credit").put(
     }
   })
 );
+
+
+
 
 module.exports = router;

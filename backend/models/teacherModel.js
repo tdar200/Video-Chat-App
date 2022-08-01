@@ -12,15 +12,12 @@ const reviewSchema = mongoose.Schema({
   },
   name: {
     type: String,
-    required: true,
   },
   rating: {
     type: Number,
-    required: true,
   },
-  comment: {
+  feedback: {
     type: String,
-    required: true,
   },
 });
 
@@ -57,7 +54,7 @@ const teacherSchema = mongoose.Schema({
   },
 
   reviews: [reviewSchema],
-  appointments : [appointmentSchema],
+  appointments: [appointmentSchema],
 
   hourly_rate: {
     type: Number,

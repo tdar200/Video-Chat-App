@@ -1,16 +1,32 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaStar } from "react-icons/fa";
 import { Modal, Form, Button } from "react-bootstrap";
+import { SocketContext } from "../Context";
+import { useDispatch } from "react-redux";
+
 
 function Ratings(props) {
+
+    const dispatch = useDispatch()
+
+
   const [rating, setRating] = useState(null);
   const [feedback, setFeedback] = useState("");
   const [hover, setHover] = useState(null);
 
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const {studentId, teacherId } = useContext(SocketContext)
+
 
   useEffect(() => {
 
-    
+    if(userInfo._id === studentId){
+        dispatch()
+
+    }
+
+
 
 
   }, [])
