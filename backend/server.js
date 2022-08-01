@@ -8,6 +8,7 @@ const errorHandler = require("./middleware/errorMiddleware");
 const app = express();
 const server = require("http").Server(app);
 const path = require("path");
+// const bodyParser = require('body-parser');
 // const io = require("socket.io")(server)
 // const { v4: uuidv4 } = require("uuid");
 
@@ -29,6 +30,7 @@ const userRoutes = require("./routes/userRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const roomRoutes = require("./routes/roomRoutes");
+const sessionRoutes = require("./routes/sessionRoutes");
 const router = require("./routes/queryRoutes");
 const protect = require("./middleware/authMiddleware");
 const { json } = require("express");
@@ -37,13 +39,18 @@ if (process.env.NODE_ENV === "DEVELOPMENT") {
   app.use(morgan("dev"));
 }
 
-app.use(express.json());
+app.use(express.json({ limit: "10mb" }));
+
+app.use(express.urlencoded({ limit: "10mb" }));
 
 app.use("/api/queries", queryRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/rooms", roomRoutes);
+app.use("/api/session", sessionRoutes);
+
+app.use("/uploads", express.static("uploads"));
 
 if (process.env.NODE_ENV === "PRODUCTION") {
   app.use(express.static(path.join(__dirname, "../frontend/build")));
@@ -62,9 +69,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-const users = {
-
-};
+const users = {};
 
 io.on("connection", async (socket) => {
   // console.log(socket, "socket backend")
@@ -75,9 +80,6 @@ io.on("connection", async (socket) => {
 
   const id = socket.handshake.query.id;
   socket.join(id);
-
-
-
 
   // console.log("users", users)
 
@@ -91,22 +93,31 @@ io.on("connection", async (socket) => {
     // socket.emit("me", socket.handshake.query.id);
   });
 
-
   socket.on("disconnect", () => {
     socket.broadcast.emit("callEnded");
   });
 
   socket.on("callUser", ({ userToCall, signalData, from }) => {
+    // console.log({userToCall, from})
 
     io.to(userToCall).emit("callUser", {
       signal: signalData,
       from: from,
       userId: from,
+      otherUserId: userToCall,
+    });
+
+    io.to(from).emit("callUser", {
+      from: userToCall,
+      userId: userToCall,
+      otherUserId: from,
     });
   });
 
+  // });
+
   socket.on("answerCall", (data) => {
-    console.log("backend answer call", data.from);
+    // console.log("backend answer call", data.from);
     io.to(data.to).emit("callAccepted", data.signal);
     io.to(data.from).emit("call-accecpted-teacher");
     io.to(data.to).emit("call-accecpted-teacher");

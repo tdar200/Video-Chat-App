@@ -35,6 +35,12 @@ import {
   roomDetailReducer
 } from "./reducers/roomReducers"
 
+import {
+  sessionDetailReducer,
+  sessionCreateReducer,
+  sessionUpdateReducer
+} from "./reducers/sessionReducers"
+
 import { callAcceptedReducer } from "./reducers/callReducers";
 
 const reducer = combineReducers({
@@ -50,6 +56,9 @@ const reducer = combineReducers({
   studentDetail: studentDetailReducer,
   studentDetailUserPopulate: studentDetailUserPopulateReducer, 
   studentUpdate: studentUpdateReducer,
+  sessionDetail : sessionDetailReducer,
+  sessionCreate : sessionCreateReducer,
+  sessionUpdate : sessionUpdateReducer,
   roomCreate: roomCreateReducer,
   roomDetail: roomDetailReducer,
   callAccepted : callAcceptedReducer,

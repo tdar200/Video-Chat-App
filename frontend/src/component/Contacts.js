@@ -9,8 +9,8 @@ function Contacts() {
 
   return (
     <ListGroup variant="flush">
-    {contacts.map(contact => (
-      <ListGroup.Item key={contact.id}>
+    {contacts.map((contact, idx) => (
+      <ListGroup.Item key={idx}>
         {contact.name}
       </ListGroup.Item>
     ))}

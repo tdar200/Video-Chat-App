@@ -21,3 +21,7 @@ li {
 #root {
   height:100%
 }
+
+.ratingInput[type="radio"] {
+  display: none;
+}

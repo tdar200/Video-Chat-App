@@ -10,13 +10,18 @@ import Notifications from "../component/Notifications";
 import { SocketContext } from "../Context";
 import Sidebar from "../component/Sidebar";
 import OpenConversation from "../component/OpenConversation";
-import { getTeacherDetails } from "../actions/teacherActions";
+import { sessionCreateAction } from "../actions/sessionActions";
+import moment from "moment";
+import Dropzone from "../component/Dropzone";
+import Ratings from "../component/Ratings";
 import Timer from "../component/Timer";
 
 function QueryDetailsPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const params = useParams();
+
+  const [showRatingModal, setShowRatingModal] = useState(false);
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -28,18 +33,31 @@ function QueryDetailsPage() {
     callEnded,
     leaveCall,
     callAccepted,
-    call
+    call,
   } = useContext(SocketContext);
 
-  // console.log(callEnded)
+  console.log("call Ended", callEnded)
 
+  useEffect(() => {
+    if (callEnded) {
+      setShowRatingModal(true);
+    }
+  }, [callEnded]);
 
+  console.log(call);
 
-  // useEffect(() => {
-  //   if (callEnded) {
-  //     navigate("/");
-  //   }
-  // }, [callEnded, leaveCall, navigate]);
+  useEffect(() => {
+    if (call) {
+      const session = {
+        teacher: call.otherUserId,
+        student: call.userId,
+        session_started: moment(),
+        active: true,
+      };
+
+      dispatch(sessionCreateAction(session));
+    }
+  }, [call, dispatch]);
 
   return (
     <div>
@@ -48,10 +66,16 @@ function QueryDetailsPage() {
       <Options>
         <Notifications />
       </Options>
+      <Dropzone />
       <div className='d-flex'>
         <Sidebar id={userInfo?._id} />
         {selectedConversation && <OpenConversation />}
       </div>
+      <Ratings
+        setshowmodal={setShowRatingModal}
+        show={showRatingModal}
+        onHide={() => setShowRatingModal(false)}
+      />
     </div>
   );
 }

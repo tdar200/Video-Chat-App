@@ -6,7 +6,7 @@ function OpenConversation() {
   const [text, setText] = useState("");
   const { sendMessage, selectedConversation } = useContext(SocketContext);
 
-  console.log("selected COnvo", selectedConversation);
+  // console.log("selected COnvo", selectedConversation);
 
   const setRef = useCallback((node) => {
     if (node) {

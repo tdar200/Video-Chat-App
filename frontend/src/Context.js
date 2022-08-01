@@ -17,7 +17,9 @@ const SocketContext = createContext();
 const ContextProvider = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const socket = io("https://new-video-chat-app.herokuapp.com/", {
+  // const socket = io("https://new-video-chat-app.herokuapp.com/",
+
+  const socket = io("http://localhost:5000/", {
     query: { id: userInfo?._id },
   });
 
@@ -31,14 +33,19 @@ const ContextProvider = ({ children }) => {
   const [me, setMe] = useState("");
   const [userIdState, setUserIdState] = useState({});
   const [callAcceptedOtherEnd, setCallAcceptedOtherEnd] = useState(false);
-  const [userId, setUserId] = useState("")
+  const [userId, setUserId] = useState("");
+
+  const [teacherId, setTeacherId] = useState("");
+  const [studentId, setStudentId] = useState("");
 
   const [contacts, setContacts] = useLocalStorage("contacts", []);
   const [conversations, setConversations] = useLocalStorage(
     "conversations",
     []
   );
-  const [selectedConversationIndex, setSelectedConversationIndex] = useState(conversations.length -1);
+  const [selectedConversationIndex, setSelectedConversationIndex] = useState(
+    conversations.length - 1
+  );
 
   const myVideo = useRef();
   const userVideo = useRef();
@@ -72,15 +79,13 @@ const ContextProvider = ({ children }) => {
   );
 
   function sendMessage(recipients, text) {
-    console.log("recipients from contec", recipients)
+    console.log("recipients from contec", recipients);
     socket.emit("send-message", { recipients, text });
 
     addMessageToConversation({ recipients, text, sender: userInfo?._id });
   }
 
   // console.log("user ID FROM Context", userId)
-
- 
 
   useEffect(() => {
     if (socket == null) return;
@@ -108,11 +113,6 @@ const ContextProvider = ({ children }) => {
       setUserIdState({ userId: userInfo?._id, socketId: sessionID });
     }
 
-    socket.on("callUser", ({ from, signal, userId }) => {
-    
-      setCall({ isReceivingCall: true, from, signal, userId });
-    });
-
     socket.on("callAccepted", () => {
       // console.log("first call accepted");
       setCallAccepted(true);
@@ -123,21 +123,33 @@ const ContextProvider = ({ children }) => {
       setCallAcceptedOtherEnd(true);
     });
 
-    socket.on("disconnect", () => {
-      setCallEnded(true);
-      const teacher = { id: userInfo?._id, from: null };
-
-      dispatch(updateTeacherAction(teacher));
-    });
-
     socket.on("receive-message", addMessageToConversation);
-
-    socket.on("callEnded", () => {
-      setCallEnded(true)
-    })
 
     return () => socket.off("receive-message");
   }, [userInfo?._id, socket.id]);
+
+  useEffect(() => {
+    socket.on("callUser", ({ from, signal, userId, otherUserId }) => {
+      setStudentId(otherUserId);
+      setTeacherId(userId);
+      console.log("context", { otherUserId, userId, studentId, teacherId });
+      setCall({ isReceivingCall: true, from, signal, userId, otherUserId });
+    });
+  }, [socket, studentId, teacherId]);
+
+  useEffect(() => {
+    // socket.on("disconnect", () => {
+
+    // });
+
+    socket.on("callEnded", () => {
+      setCallEnded(true);
+      const teacher = { id: userInfo?._id, from: null };
+      // dispatch(updateTeacherAction(teacher));
+    });
+
+    return () => socket.off("callEnded");
+  }, [dispatch, socket, userInfo?._id]);
 
   useEffect(() => {
     if (performance.getEntriesByType("navigation")[0].type === "reload") {
@@ -186,7 +198,7 @@ const ContextProvider = ({ children }) => {
     setCallAccepted(true);
     dispatch(callAcceptedAction);
     // setUserId(call.from)
-    
+
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on("signal", (data) => {
@@ -298,7 +310,9 @@ const ContextProvider = ({ children }) => {
         contacts,
         createContact,
         setUserId,
-        userId
+        userId,
+        studentId,
+        teacherId,
       }}>
       {children}
     </SocketContext.Provider>

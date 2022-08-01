@@ -76,11 +76,12 @@ function Options() {
   const classes = useStyles();
 
   // console.log("student detail user populate", studentDetailUserPopulate)
-  console.log("call", call.from)
+
+  
 
   useEffect(() => {
     if (call?.from && !success &&  loading) {
-      console.log("is this function being run")
+      // console.log("is this function being run")
       dispatch(studentDetailUserPopulateAction(call?.from));
     }
   }, [call?.from, dispatch, loading, student, success]);
