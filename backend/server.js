@@ -49,7 +49,6 @@ app.use("/api/teachers", teacherRoutes);
 app.use("/api/students", studentRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/session", sessionRoutes);
-
 app.use("/uploads", express.static("uploads"));
 
 if (process.env.NODE_ENV === "PRODUCTION") {

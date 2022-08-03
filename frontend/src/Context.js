@@ -79,7 +79,7 @@ const ContextProvider = ({ children }) => {
   );
 
   function sendMessage(recipients, text) {
-    console.log("recipients from contec", recipients);
+    // console.log("recipients from contec", recipients);
     socket.emit("send-message", { recipients, text });
 
     addMessageToConversation({ recipients, text, sender: userInfo?._id });
@@ -145,6 +145,7 @@ const ContextProvider = ({ children }) => {
     socket.on("callEnded", () => {
       setCallEnded(true);
       const teacher = { id: userInfo?._id, from: null };
+      leaveCall()
       // dispatch(updateTeacherAction(teacher));
     });
 
@@ -274,14 +275,17 @@ const ContextProvider = ({ children }) => {
   };
 
   const leaveCall = (id) => {
+
+    // socket.emit("disconnect")
+
     setCallEnded(true);
-    connectionRef.current.destroy();
+    connectionRef?.current?.destroy();
 
-    const teacher = { id, from: null };
+    // const teacher = { id, from: null };
 
-    dispatch(updateTeacherAction(teacher));
+    // dispatch(updateTeacherAction(teacher));
 
-    window.location.reload();
+    // window.location.reload();
   };
 
   return (

@@ -4,11 +4,8 @@ import { Modal, Form, Button } from "react-bootstrap";
 import { SocketContext } from "../Context";
 import { useDispatch } from "react-redux";
 
-
 function Ratings(props) {
-
-    const dispatch = useDispatch()
-
+  const dispatch = useDispatch();
 
   const [rating, setRating] = useState(null);
   const [feedback, setFeedback] = useState("");
@@ -16,31 +13,24 @@ function Ratings(props) {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const {studentId, teacherId } = useContext(SocketContext)
-
+  const { studentId, teacherId } = useContext(SocketContext);
 
   useEffect(() => {
-
-    if(userInfo._id === studentId){
-        dispatch()
-
+    if (userInfo._id === studentId) {
+      // dispatch()
     }
-
-
-
-
-  }, [])
-
+  }, []);
 
   return (
     <Modal
       show={props.show}
       onHide={props.onHide}
-      size='lg'
-      aria-labelledby='contained-modal-title-vcenter'
-      centered>
+      size="lg"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
       <Modal.Header closeButton>
-        <Modal.Title id='contained-modal-title-vcenter'>Ratings</Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Ratings</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -54,14 +44,14 @@ function Ratings(props) {
               return (
                 <label>
                   <input
-                    className='ratingInput'
-                    type='radio'
-                    name='rating'
+                    className="ratingInput"
+                    type="radio"
+                    name="rating"
                     value={ratingValue}
                     onClick={() => setRating(ratingValue)}
                   />
                   <FaStar
-                    className='star'
+                    className="star"
                     color={
                       ratingValue <= (hover || rating) ? "#ffc107" : "#e4e5e9"
                     }
@@ -78,14 +68,15 @@ function Ratings(props) {
             <Form.Label>Leave a feedback for the session </Form.Label>
 
             <textarea
-              class='form-control'
-              id='exampleFormControlTextarea1'
-              rows='3'
+              class="form-control"
+              id="exampleFormControlTextarea1"
+              rows="3"
               onChange={(e) => setFeedback(e.target.value)}
-              value={feedback}></textarea>
+              value={feedback}
+            ></textarea>
           </Form.Group>
 
-          <Button variant='success' type='submit'>
+          <Button variant="success" type="submit">
             Submit
           </Button>
         </Form>
