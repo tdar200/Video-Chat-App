@@ -3,17 +3,75 @@ const dotenv = require("dotenv");
 const morgan = require("morgan");
 const cors = require("cors");
 const connectDB = require("./connectDB");
+const mongoose = require("mongoose");
 const notFound = require("./middleware/errorMiddleware");
 const errorHandler = require("./middleware/errorMiddleware");
+const fileUpload = require("express-fileupload");
+const fs = require("fs");
+const { GridFsStorage } = require("multer-gridfs-storage");
+const multer = require("multer");
+const Grid = require("gridfs-stream");
 const app = express();
+
+app.use(
+  fileUpload({
+    createParentPath: true,
+  })
+);
+
+app.use(morgan("dev"));
+
+// establish a connection wiht the database
+dotenv.config();
+connectDB();
+async function init() {
+  await connectDB();
+
+  //GridFS & Multer
+
+  const conn = mongoose.connection;
+
+  // create a stream connection with our cluster
+  const gfs = await Grid(conn.db, mongoose.mongo);
+
+  //name of the bucket where media is going to be retrieved
+  gfs.collection("media");
+
+  // secifying a storage location in our cluster for multer
+  const storage = await new GridFsStorage({
+    db: conn.db,
+    file: (req, file) => {
+      return new Promise((resolve, reject) => {
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) {
+            return reject(err);
+          }
+          const filename =
+            buf.toString("hex") + path.extname(file.originalname);
+          const fileInfo = {
+            filename,
+            bucketName: "media",
+          };
+          return resolve(fileInfo);
+        });
+      });
+    },
+  });
+
+  // inializing our multer storage
+  const upload = multer({ storage });
+
+  app.post("/upload", upload.single("file"), (req, res) => {
+    console.log("shutahdwdadadadawdawdawdawd", { file });
+    res.json(req.file);
+  });
+}
+init();
 const server = require("http").Server(app);
 const path = require("path");
 // const bodyParser = require('body-parser');
 // const io = require("socket.io")(server)
 // const { v4: uuidv4 } = require("uuid");
-
-dotenv.config();
-connectDB();
 
 const io = require("socket.io")(server, {
   cors: {
@@ -41,7 +99,7 @@ if (process.env.NODE_ENV === "DEVELOPMENT") {
 
 app.use(express.json({ limit: "10mb" }));
 
-app.use(express.urlencoded({ limit: "10mb" }));
+// app.use(express.urlencoded({ limit: "10mb" }));
 
 app.use("/api/queries", queryRoutes);
 app.use("/api/user", userRoutes);
@@ -79,7 +137,8 @@ io.on("connection", async (socket) => {
   // console.log(clients)
 
   const id = socket.handshake.query.id;
-  socket.join(id);
+  socket.join(id)
+;
 
   // console.log("users", users)
 
@@ -126,7 +185,8 @@ io.on("connection", async (socket) => {
   socket.on("send-message", ({ recipients, text }) => {
     recipients.forEach((recipient) => {
       const newRecipients = recipients.filter((r) => r !== recipient);
-      newRecipients.push(id);
+      newRecipients.push(id)
+;
       socket.broadcast.to(recipient).emit("receive-message", {
         recipients: newRecipients,
         sender: id,
