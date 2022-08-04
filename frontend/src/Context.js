@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { callAcceptedAction } from "./actions/callActions";
 import { updateTeacherAction } from "./actions/teacherActions";
 import useLocalStorage from "./hooks/useLocalStorage";
-
+import axios from "axios";
 const SocketContext = createContext();
 
 const ContextProvider = ({ children }) => {
@@ -43,6 +43,7 @@ const ContextProvider = ({ children }) => {
     "conversations",
     []
   );
+  const [myRecorder, setMyRecorder] = useState(null);
   const [selectedConversationIndex, setSelectedConversationIndex] = useState(
     conversations.length - 1
   );
@@ -50,6 +51,19 @@ const ContextProvider = ({ children }) => {
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
+
+  const uploadFile = async (blob) => {
+    console.log("request sent with this BLOBL", { blob });
+    if (blob) {
+      const fd = new FormData();
+
+      fd.append("file", blob);
+
+      const res = axios
+        .post("http://localhost:5000/upload", fd)
+        .then((res) => console.log({ res }));
+    }
+  };
 
   const addMessageToConversation = useCallback(
     ({ recipients, text, sender }) => {
@@ -79,13 +93,10 @@ const ContextProvider = ({ children }) => {
   );
 
   function sendMessage(recipients, text) {
-    console.log("recipients from contec", recipients);
     socket.emit("send-message", { recipients, text });
 
     addMessageToConversation({ recipients, text, sender: userInfo?._id });
   }
-
-  // console.log("user ID FROM Context", userId)
 
   useEffect(() => {
     if (socket == null) return;
@@ -94,7 +105,6 @@ const ContextProvider = ({ children }) => {
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         if (currentStream) {
-          // console.log("stream from context", currentStream);
           setStream(currentStream);
           myVideo.current.srcObject = currentStream;
         }
@@ -114,12 +124,12 @@ const ContextProvider = ({ children }) => {
     }
 
     socket.on("callAccepted", () => {
-      // console.log("first call accepted");
+      console.log({ stream }, "this is my streammmmmmmmmmmmm");
+
       setCallAccepted(true);
     });
 
     socket.on("call-accecpted-teacher", () => {
-      // console.log("accepted the call aand connection established");
       setCallAcceptedOtherEnd(true);
     });
 
@@ -132,17 +142,23 @@ const ContextProvider = ({ children }) => {
     socket.on("callUser", ({ from, signal, userId, otherUserId }) => {
       setStudentId(otherUserId);
       setTeacherId(userId);
-      console.log("context", { otherUserId, userId, studentId, teacherId });
       setCall({ isReceivingCall: true, from, signal, userId, otherUserId });
     });
   }, [socket, studentId, teacherId]);
 
+  useEffect(() => {
+    console.log("useeffect of calls", { myRecorder, callEnded });
+    if (myRecorder && callEnded == true) {
+      myRecorder.stop();
+    }
+  }, [callEnded]);
   useEffect(() => {
     // socket.on("disconnect", () => {
 
     // });
 
     socket.on("callEnded", () => {
+      if (myRecorder) myRecorder.stop();
       setCallEnded(true);
       const teacher = { id: userInfo?._id, from: null };
       // dispatch(updateTeacherAction(teacher));
@@ -176,7 +192,7 @@ const ContextProvider = ({ children }) => {
       const contact = contacts.find((contact) => {
         return contact.id === recipient;
       });
-      const name = (contact && contact.name) || recipient;
+      const name = (contact && contact?.name) || recipient;
       return { id: recipient, name };
     });
 
@@ -194,7 +210,6 @@ const ContextProvider = ({ children }) => {
   });
 
   const answerCall = () => {
-    // console.log("callWas accccpected");
     setCallAccepted(true);
     dispatch(callAcceptedAction);
     // setUserId(call.from)
@@ -204,7 +219,6 @@ const ContextProvider = ({ children }) => {
     peer.on("signal", (data) => {
       // setCallAccepted(true);
 
-      // console.log(data, "data from context")
       socket.emit("answerCall", {
         signal: data,
         to: call.from,
@@ -217,7 +231,6 @@ const ContextProvider = ({ children }) => {
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         if (currentStream) {
-          // console.log("stream from context", currentStream);
           setStream(currentStream);
           myVideo.current.srcObject = currentStream;
         }
@@ -228,7 +241,6 @@ const ContextProvider = ({ children }) => {
     });
 
     socket.on("answerCall", () => {
-      // console.log("accepted ma ");
       setCallAccepted(true);
     });
 
@@ -247,21 +259,53 @@ const ContextProvider = ({ children }) => {
         from: userInfo?._id,
       });
     });
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        if (currentStream) {
+          setStream(currentStream);
+          const recorder = new MediaRecorder(currentStream);
 
+          console.log({ recorder });
+
+          const chunks = [];
+          recorder.ondataavailable = (e) => chunks.push(e.data);
+          recorder.onstop = (e) => {
+            console.log({ chunkType: chunks[0].type });
+            const blob = new Blob(chunks, { type: chunks[0].type });
+
+            stream.getVideoTracks()[0].stop();
+
+            const filename = "Shutah.mkv";
+
+            // console.log(blob.stream().pipe(()))
+            if (window.navigator.msSaveOrOpenBlob) {
+              window.navigator.msSaveBlob(blob, filename);
+            } else {
+              var elem = window.document.createElement("a");
+              elem.href = window.URL.createObjectURL(blob);
+              elem.download = filename;
+              document.body.appendChild(elem);
+              elem.click();
+              document.body.removeChild(elem);
+            }
+            const file = new File([blob], "shutah.mkv", {
+              type: chunks[0].type,
+            });
+            console.log({ uploaded: file });
+            uploadFile(blob);
+          };
+          recorder.start();
+
+          setMyRecorder(recorder);
+          myVideo.current.srcObject = currentStream;
+
+          return currentStream;
+        }
+      });
     socket.on("callAccepted", (signal) => {
-      // console.log("this function is triggerd 2");
-
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((currentStream) => {
-          if (currentStream) {
-            // console.log("stream from context", currentStream);
-            setStream(currentStream);
-            myVideo.current.srcObject = currentStream;
-          }
-        });
-
       peer.on("stream", (currentStream) => {
+        socket.emit("startRecording", signal);
         userVideo.current.srcObject = currentStream;
       });
 
@@ -313,7 +357,8 @@ const ContextProvider = ({ children }) => {
         userId,
         studentId,
         teacherId,
-      }}>
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );

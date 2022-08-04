@@ -22,7 +22,7 @@ function Ratings(props) {
   useEffect(() => {
 
     if(userInfo._id === studentId){
-        dispatch()
+        // dispatch()
 
     }
 
