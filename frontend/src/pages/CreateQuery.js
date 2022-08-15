@@ -110,7 +110,7 @@ function CreateQuery() {
     } else {
       navigate(`/rooms/${idToCall}`);
     }
-  }, [callAccepted, idToCall, navigate, setCallEnded, teacher?.call_connected]);
+  }, [callAccepted, idToCall, navigate, teacher?.call_connected]);
 
   const handleDelete = () => {
     dispatch(deleteQuery(queries[0]._id));

@@ -15,11 +15,20 @@ function Ratings(props) {
 
   const { studentId, teacherId } = useContext(SocketContext);
 
+<<<<<<< Updated upstream
   useEffect(() => {
     if (userInfo._id === studentId) {
       // dispatch()
     }
   }, []);
+=======
+//   useEffect(() => {
+//     if (userInfo._id === studentId) {
+
+//     }
+//   }, []);
+
+>>>>>>> Stashed changes
 
   return (
     <Modal

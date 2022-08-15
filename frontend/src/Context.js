@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { callAcceptedAction } from "./actions/callActions";
 import { updateTeacherAction } from "./actions/teacherActions";
 import useLocalStorage from "./hooks/useLocalStorage";
+import axios from "axios";
 
 const SocketContext = createContext();
 
@@ -24,6 +25,9 @@ const ContextProvider = ({ children }) => {
   });
 
   const dispatch = useDispatch();
+
+  const [myRecorder, setMyRecorder] = useState(null);
+  const [userRecorder, setUserRecorder] = useState(null)
 
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
@@ -50,6 +54,17 @@ const ContextProvider = ({ children }) => {
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
+
+  const uploadFile = async (blob) => {
+    if (blob) {
+      const fd = new FormData();
+      fd.append("file", blob);
+
+      const { data } = axios.post("http://localhost:5000/upload", fd);
+
+      console.log("data from upload file", data);
+    }
+  };
 
   const addMessageToConversation = useCallback(
     ({ recipients, text, sender }) => {
@@ -90,6 +105,7 @@ const ContextProvider = ({ children }) => {
   useEffect(() => {
     if (socket == null) return;
 
+<<<<<<< Updated upstream
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
@@ -101,6 +117,17 @@ const ContextProvider = ({ children }) => {
             "current Stream")
         }
       });
+=======
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    //     if (currentStream) {
+    //       // console.log("stream from context", currentStream);
+    //       setStream(currentStream);
+    //       myVideo.current.srcObject = currentStream;
+    //     }
+    //   });
+>>>>>>> Stashed changes
 
     const sessionID = socket.id;
 
@@ -131,6 +158,12 @@ const ContextProvider = ({ children }) => {
   }, [userInfo?._id, socket.id]);
 
   useEffect(() => {
+    if(myRecorder && callEnded === true){
+      myRecorder.stop()
+    }
+  },[callEnded, myRecorder])
+
+  useEffect(() => {
     socket.on("callUser", ({ from, signal, userId, otherUserId }) => {
       setStudentId(otherUserId);
       setTeacherId(userId);
@@ -145,6 +178,11 @@ const ContextProvider = ({ children }) => {
     // });
 
     socket.on("callEnded", () => {
+
+      if(myRecorder) {
+        myRecorder.stop()
+      }
+
       setCallEnded(true);
       const teacher = { id: userInfo?._id, from: null };
       leaveCall();
@@ -152,7 +190,7 @@ const ContextProvider = ({ children }) => {
     });
 
     return () => socket.off("callEnded");
-  }, [dispatch, socket, userInfo?._id]);
+  }, [dispatch, myRecorder, socket, userInfo?._id]);
 
   useEffect(() => {
     if (performance.getEntriesByType("navigation")[0].type === "reload") {
@@ -216,15 +254,15 @@ const ContextProvider = ({ children }) => {
       });
     });
 
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        if (currentStream) {
-          // console.log("stream from context", currentStream);
-          setStream(currentStream);
-          myVideo.current.srcObject = currentStream;
-        }
-      });
+    // navigator.mediaDevices
+    //   .getUserMedia({ video: true, audio: true })
+    //   .then((currentStream) => {
+    //     if (currentStream) {
+    //       // console.log("stream from context", currentStream);
+    //       setStream(currentStream);
+    //       myVideo.current.srcObject = currentStream;
+    //     }
+    //   });
 
     peer.on("stream", (currentStream) => {
       userVideo.current.srcObject = currentStream;
@@ -260,7 +298,50 @@ const ContextProvider = ({ children }) => {
           if (currentStream) {
             // console.log("stream from context", currentStream);
             setStream(currentStream);
+
+            const recorder = new MediaRecorder(currentStream)
+
+            const chunks = []
+
+            recorder.ondataavailable = (e) => chunks.push(e.data)
+            recorder.onstop = (e) => {
+              const blob = new Blob(chunks, {type: chunks[0].type})
+
+
+              stream.getVideoTracks()[0].stop()
+
+              const filename = "newRecording.mkv"
+  
+              if(window.navigator.msSaveOrOpenBlob){
+                window.navigator.msSaveBlob(blob, filename)
+              }
+              else {
+                // const 
+
+                var elem = window.document.createElement("a");
+                elem.href = window.URL.createObjectURL(blob);
+                elem.download = filename;
+                document.body.appendChild(elem);
+                elem.click();
+                document.body.removeChild(elem);
+
+              }
+  
+              const file = new File([blob], "shutah.mkv", {
+                type: chunks[0].type,
+              });
+              uploadFile(blob);
+              
+            }
+
+            recorder.start();
+
+            setMyRecorder(recorder);
+
+
             myVideo.current.srcObject = currentStream;
+
+            return currentStream
           }
         });
 

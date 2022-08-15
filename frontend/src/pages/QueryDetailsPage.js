@@ -25,27 +25,21 @@ function QueryDetailsPage() {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const sessionCreate = useSelector((state) => state.sessionCreate )
+  const sessionCreate = useSelector((state) => state.sessionCreate);
 
-  const {loading, success , session} = sessionCreate
+  const { loading, success, session } = sessionCreate;
 
-  console.log("sessionCreate", sessionCreate)
+  console.log("sessionCreate", sessionCreate);
 
-  const {
-    selectedConversation,
-    myVideo,
-    stream,
-    userVideo,
-    callEnded,
-    leaveCall,
-    callAccepted,
-    call,
-  } = useContext(SocketContext);
+  const { selectedConversation, callEnded, call } = useContext(SocketContext);
 
-  console.log("call Ended", callEnded)
+  console.log("call Ended", callEnded);
 
   useEffect(() => {
+    // setShowRatingModal(false);
+
     if (callEnded) {
+      console.log("why this is running???", callEnded)
       setShowRatingModal(true);
     }
   }, [callEnded]);
@@ -77,11 +71,21 @@ function QueryDetailsPage() {
         <Sidebar id={userInfo?._id} />
         {selectedConversation && <OpenConversation />}
       </div>
+<<<<<<< Updated upstream
       {/* <Ratings
         setshowmodal={setShowRatingModal}
         show={showRatingModal}
         onHide={() => setShowRatingModal(false)}
       /> */}
+=======
+      {showRatingModal && (
+        <Ratings
+          setshowmodal={setShowRatingModal}
+          show={showRatingModal}
+          onHide={() => setShowRatingModal(false)}
+        />
+      )}
+>>>>>>> Stashed changes
     </div>
   );
 }

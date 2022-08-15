@@ -8,12 +8,65 @@ const errorHandler = require("./middleware/errorMiddleware");
 const app = express();
 const server = require("http").Server(app);
 const path = require("path");
+const fileUpload = require("express-fileUpload");
+const fs = require("fs");
+const { GridFsStorage } = require("multer-gridfs-storage");
+const multer = require("multer");
+const Grid = require("gridfs-stream");
+const mongoose = require("mongoose");
 // const bodyParser = require('body-parser');
 // const io = require("socket.io")(server)
 // const { v4: uuidv4 } = require("uuid");
 
 dotenv.config();
 connectDB();
+
+let bucket;
+let db;
+
+async function init() {
+  //GridFS & Multer
+
+  mongoose.connection.on("connected", () => {
+    db = mongoose.connections[0].db;
+    // console.log("db inside", db);
+    bucket = new mongoose.mongo.GridFSBucket(db, {
+      bucketName: "newBucket",
+    });
+    // console.log(bucket);
+  });
+
+  const storage = await new GridFsStorage({
+    url: process.env.MONGO_URI,
+
+    file: (req, res) => {
+      return new Promise((resolve, reject) => {
+        crypto.randomBytes(16, (err, buf) => {
+          if (err) {
+            return reject(err);
+          }
+          const filename =
+            buf.toString("hex") + path.extname(file.originalname);
+
+          const fileInfo = {
+            filename,
+            bucketName: "media",
+          };
+
+          return resolve(fileInfo);
+        });
+      });
+    },
+  });
+
+  const upload = multer({ storage });
+
+  app.post("/upload", upload.single("file"), (req, res) => {
+    res.json(req.file);
+  });
+}
+init();
+
 
 const io = require("socket.io")(server, {
   cors: {
@@ -34,6 +87,7 @@ const sessionRoutes = require("./routes/sessionRoutes");
 const router = require("./routes/queryRoutes");
 const protect = require("./middleware/authMiddleware");
 const { json } = require("express");
+const { resolve } = require("path");
 
 if (process.env.NODE_ENV === "DEVELOPMENT") {
   app.use(morgan("dev"));
