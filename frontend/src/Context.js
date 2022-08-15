@@ -97,6 +97,8 @@ const ContextProvider = ({ children }) => {
           // console.log("stream from context", currentStream);
           setStream(currentStream);
           myVideo.current.srcObject = currentStream;
+          console.log(currentStream, 
+            "current Stream")
         }
       });
 
@@ -132,7 +134,7 @@ const ContextProvider = ({ children }) => {
     socket.on("callUser", ({ from, signal, userId, otherUserId }) => {
       setStudentId(otherUserId);
       setTeacherId(userId);
-      console.log("context", { otherUserId, userId, studentId, teacherId });
+      // console.log("context", { otherUserId, userId, studentId, teacherId });
       setCall({ isReceivingCall: true, from, signal, userId, otherUserId });
     });
   }, [socket, studentId, teacherId]);
@@ -145,7 +147,7 @@ const ContextProvider = ({ children }) => {
     socket.on("callEnded", () => {
       setCallEnded(true);
       const teacher = { id: userInfo?._id, from: null };
-      leaveCall()
+      leaveCall();
       // dispatch(updateTeacherAction(teacher));
     });
 
@@ -275,7 +277,6 @@ const ContextProvider = ({ children }) => {
   };
 
   const leaveCall = (id) => {
-
     // socket.emit("disconnect")
 
     setCallEnded(true);
@@ -317,7 +318,8 @@ const ContextProvider = ({ children }) => {
         userId,
         studentId,
         teacherId,
-      }}>
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );

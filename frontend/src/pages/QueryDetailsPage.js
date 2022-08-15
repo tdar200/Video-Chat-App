@@ -77,11 +77,11 @@ function QueryDetailsPage() {
         <Sidebar id={userInfo?._id} />
         {selectedConversation && <OpenConversation />}
       </div>
-      <Ratings
+      {/* <Ratings
         setshowmodal={setShowRatingModal}
         show={showRatingModal}
         onHide={() => setShowRatingModal(false)}
-      />
+      /> */}
     </div>
   );
 }
